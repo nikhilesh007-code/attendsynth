@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "attendsynth"
+version = "1.0.0"
+description = "AttendSynth AI: Synthetic Student Engagement & Attendance Generator for Early-Warning Predictive Models"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Nikhilesh", url = "https://github.com/nikhilesh007-code"}
+]
+urls = {
+    "Homepage" = "https://github.com/nikhilesh007-code/attendsynth",
+    "Repository" = "https://github.com/nikhilesh007-code/attendsynth",
+    "Author" = "https://github.com/nikhilesh007-code"
+}
+keywords = [
+    "synthetic-data",
+    "education",
+    "edtech",
+    "early-warning-system",
+    "attendance",
+    "lms",
+    "differential-privacy",
+    "ferpa",
+    "ed-fi"
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "scikit-learn>=1.2.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.24.0",
+]
+
+[project.scripts]
+attendsynth = "attendsynth.cli:main"
+
