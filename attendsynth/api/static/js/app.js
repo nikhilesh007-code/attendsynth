@@ -4,9 +4,13 @@ let currentCohort = null;
 let currentStudentPage = 1;
 let currentLimit = 25;
 let charts = {};
+let latestRocData = null;
+let latestTimelineData = null;
 
 // On DOM ready
 document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  initSidebar();
   initDashboard();
 });
 
@@ -17,16 +21,127 @@ async function initDashboard() {
   await loadPrivacyAndFidelity();
 }
 
-// Tab Switching
+// ==========================================
+// THEME SWITCHER (Dark / White)
+// ==========================================
+
+function initTheme() {
+  const isDark = document.documentElement.classList.contains("dark");
+  updateThemeUI(isDark);
+}
+
+function toggleTheme() {
+  const isDarkNow = document.documentElement.classList.contains("dark");
+  const newDark = !isDarkNow;
+
+  if (newDark) {
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("attendsynth_theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("attendsynth_theme", "light");
+  }
+
+  updateThemeUI(newDark);
+  updateChartsTheme();
+}
+
+function updateThemeUI(isDark) {
+  const btnText = document.getElementById("themeBtnText");
+  if (btnText) {
+    btnText.innerText = isDark ? "Theme: Dark" : "Theme: Light";
+  }
+}
+
+function getChartColors() {
+  const isDark = document.documentElement.classList.contains("dark");
+  return {
+    isDark,
+    grid: isDark ? "#1e293b" : "#e2e8f0",
+    text: isDark ? "#94a3b8" : "#64748b",
+    legend: isDark ? "#94a3b8" : "#475569",
+    doughnutBorder: isDark ? "#0f172a" : "#ffffff",
+  };
+}
+
+function updateChartsTheme() {
+  if (currentCohort && currentCohort.summary) {
+    renderOverviewCharts(currentCohort.summary);
+  }
+  if (latestRocData) {
+    renderRocCurve(latestRocData.points, latestRocData.auc);
+  }
+  if (latestTimelineData) {
+    renderStudentTimelineChart(latestTimelineData);
+  }
+}
+
+// ==========================================
+// COLLAPSIBLE SIDEBAR CONTROLLER
+// ==========================================
+
+function initSidebar() {
+  const savedState = localStorage.getItem("attendsynth_sidebar");
+  const sidebar = document.getElementById("appSidebar");
+  if (savedState === "collapsed" && sidebar) {
+    sidebar.classList.add("sidebar-collapsed");
+    updateSidebarToggleBtn(true);
+  } else {
+    updateSidebarToggleBtn(false);
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("appSidebar");
+  if (!sidebar) return;
+
+  const isCollapsed = sidebar.classList.toggle("sidebar-collapsed");
+  localStorage.setItem("attendsynth_sidebar", isCollapsed ? "collapsed" : "expanded");
+  updateSidebarToggleBtn(isCollapsed);
+
+  // Resize charts smoothly after sidebar transition
+  setTimeout(() => {
+    Object.values(charts).forEach(c => {
+      if (c && typeof c.resize === "function") c.resize();
+    });
+  }, 300);
+}
+
+function updateSidebarToggleBtn(isCollapsed) {
+  const btn = document.getElementById("sidebarToggleBtn");
+  if (!btn) return;
+  const label = btn.querySelector(".sidebar-label");
+  if (label) {
+    label.innerText = isCollapsed ? "Expand" : "Collapse Sidebar";
+  }
+}
+
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById("appSidebar");
+  const backdrop = document.getElementById("mobileBackdrop");
+  if (!sidebar || !backdrop) return;
+
+  const isHidden = sidebar.classList.contains("-translate-x-full");
+  if (isHidden) {
+    sidebar.classList.remove("-translate-x-full");
+    backdrop.classList.remove("hidden");
+  } else {
+    sidebar.classList.add("-translate-x-full");
+    backdrop.classList.add("hidden");
+  }
+}
+
+// ==========================================
+// TAB SWITCHING
+// ==========================================
+
 function switchTab(tabName) {
   document.querySelectorAll(".nav-tab").forEach(t => {
     t.classList.remove("active-tab");
-    t.classList.add("text-slate-400");
   });
   const activeBtn = document.getElementById(`tab-${tabName}`);
   if (activeBtn) {
     activeBtn.classList.add("active-tab");
-    activeBtn.classList.remove("text-slate-400");
   }
 
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
@@ -35,14 +150,26 @@ function switchTab(tabName) {
     activePanel.classList.remove("hidden");
   }
 
+  // Close mobile sidebar if open
+  const sidebar = document.getElementById("appSidebar");
+  const backdrop = document.getElementById("mobileBackdrop");
+  if (window.innerWidth < 768 && sidebar && !sidebar.classList.contains("-translate-x-full")) {
+    toggleMobileSidebar();
+  }
+
   // Trigger chart resizes if needed
   if (tabName === "overview" && charts.archetypeChart) {
-    charts.archetypeChart.resize();
-    charts.riskTierChart.resize();
+    setTimeout(() => {
+      charts.archetypeChart.resize();
+      charts.riskTierChart.resize();
+    }, 50);
   }
 }
 
-// Fetch Cohort Summary
+// ==========================================
+// COHORT OVERVIEW & CHARTS
+// ==========================================
+
 async function fetchCohortSummary() {
   try {
     const res = await fetch("/api/cohorts/current");
@@ -73,6 +200,8 @@ async function fetchCohortSummary() {
 }
 
 function renderOverviewCharts(summary) {
+  const theme = getChartColors();
+
   // 1. Archetype Breakdown Chart
   const archLabels = {
     CONSISTENT_ACHIEVER: "Consistent Achiever",
@@ -104,7 +233,7 @@ function renderOverviewCharts(summary) {
           "#f43f5e", // rose
           "#14b8a6", // teal
         ],
-        borderRadius: 4,
+        borderRadius: 6,
       }]
     },
     options: {
@@ -112,8 +241,8 @@ function renderOverviewCharts(summary) {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { display: false } },
-        y: { ticks: { color: "#94a3b8", font: { size: 10 } }, grid: { color: "#1e293b" } }
+        x: { ticks: { color: theme.text, font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: theme.text, font: { size: 10 } }, grid: { color: theme.grid } }
       }
     }
   });
@@ -132,7 +261,7 @@ function renderOverviewCharts(summary) {
         data: riskVals,
         backgroundColor: ["#10b981", "#06b6d4", "#f59e0b", "#f43f5e"],
         borderWidth: 2,
-        borderColor: "#0f172a",
+        borderColor: theme.doughnutBorder,
       }]
     },
     options: {
@@ -141,7 +270,7 @@ function renderOverviewCharts(summary) {
       plugins: {
         legend: {
           position: "bottom",
-          labels: { color: "#94a3b8", font: { size: 11 }, padding: 12 }
+          labels: { color: theme.legend, font: { size: 11 }, padding: 12 }
         }
       },
       cutout: "65%",
@@ -149,7 +278,10 @@ function renderOverviewCharts(summary) {
   });
 }
 
-// Student Cohort Explorer
+// ==========================================
+// STUDENT COHORT EXPLORER
+// ==========================================
+
 async function loadStudents(page = 1) {
   currentStudentPage = page;
   const search = document.getElementById("studentSearchInput").value;
@@ -173,37 +305,37 @@ async function loadStudents(page = 1) {
 
     data.students.forEach(s => {
       const tr = document.createElement("tr");
-      tr.className = "hover:bg-slate-800/40 transition-colors";
+      tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors";
 
       const riskPillColor = {
-        CRITICAL: "bg-rose-500/20 text-rose-300 border-rose-500/30",
-        ELEVATED: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-        MODERATE: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-        LOW: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-      }[s.risk_level] || "bg-slate-700 text-slate-300";
+        CRITICAL: "bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/30",
+        ELEVATED: "bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/30",
+        MODERATE: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 border-cyan-500/30",
+        LOW: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/30",
+      }[s.risk_level] || "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
 
       const attPct = (s.attendance_rate * 100).toFixed(1);
       const subPct = (s.assignment_submission_rate * 100).toFixed(0);
 
       tr.innerHTML = `
         <td class="py-2.5 px-4 font-sans">
-          <div class="font-bold text-slate-200 text-xs">${s.display_name}</div>
+          <div class="font-bold text-slate-900 dark:text-slate-200 text-xs">${s.display_name}</div>
           <div class="text-slate-500 text-[10px] font-mono">${s.student_id}</div>
         </td>
-        <td class="py-2.5 px-3 font-sans text-slate-300 text-xs">
+        <td class="py-2.5 px-3 font-sans text-slate-700 dark:text-slate-300 text-xs">
           <div>${s.school_name}</div>
           <div class="text-[10px] text-slate-500">Grade ${s.grade_level} &bull; GPA ${s.baseline_gpa}</div>
         </td>
-        <td class="py-2.5 px-3 font-sans text-xs text-slate-400">
+        <td class="py-2.5 px-3 font-sans text-xs text-slate-600 dark:text-slate-400">
           ${s.archetype_label}
         </td>
-        <td class="py-2.5 px-3 text-xs ${s.chronic_absenteeism_flag ? 'text-rose-400 font-bold' : 'text-emerald-400'}">
+        <td class="py-2.5 px-3 text-xs ${s.chronic_absenteeism_flag ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-emerald-600 dark:text-emerald-400'}">
           ${attPct}% ${s.chronic_absenteeism_flag ? '⚠️' : ''}
         </td>
-        <td class="py-2.5 px-3 text-xs text-slate-300">
+        <td class="py-2.5 px-3 text-xs text-slate-700 dark:text-slate-300">
           ${s.avg_daily_lms_minutes}m
         </td>
-        <td class="py-2.5 px-3 text-xs text-slate-300">
+        <td class="py-2.5 px-3 text-xs text-slate-700 dark:text-slate-300">
           ${subPct}%
         </td>
         <td class="py-2.5 px-3">
@@ -212,7 +344,7 @@ async function loadStudents(page = 1) {
           </span>
         </td>
         <td class="py-2.5 px-3 text-right">
-          <button onclick="viewStudentDetail('${s.student_id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded text-[11px] font-semibold border border-slate-700 transition-all">
+          <button onclick="viewStudentDetail('${s.student_id}')" class="px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-emerald-600 dark:text-emerald-400 rounded-lg text-[11px] font-semibold border border-slate-200 dark:border-slate-700 shadow-sm transition-all">
             Inspect &rarr;
           </button>
         </td>
@@ -244,6 +376,7 @@ async function viewStudentDetail(studentId) {
     const data = await res.json();
     const s = data.student;
     const records = data.daily_timeline;
+    latestTimelineData = records;
 
     const modal = document.getElementById("studentDetailModal");
     modal.classList.remove("hidden");
@@ -255,9 +388,9 @@ async function viewStudentDetail(studentId) {
 
     const riskBadge = document.getElementById("modalStudentRiskBadge");
     riskBadge.innerText = `${s.risk_level} RISK (Score: ${Math.round(s.composite_risk_score)})`;
-    riskBadge.className = `text-xs font-semibold px-2 py-0.5 rounded ${
-      s.risk_level === 'CRITICAL' ? 'bg-rose-500/20 text-rose-300' : (
-        s.risk_level === 'ELEVATED' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+    riskBadge.className = `text-xs font-semibold px-2 py-0.5 rounded-md ${
+      s.risk_level === 'CRITICAL' ? 'bg-rose-500/20 text-rose-600 dark:text-rose-300' : (
+        s.risk_level === 'ELEVATED' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-300' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
       )
     }`;
 
@@ -275,12 +408,12 @@ async function viewStudentDetail(studentId) {
       tile.className = "w-5 h-5 rounded day-tile cursor-pointer relative group flex items-center justify-center text-[9px] font-mono font-bold";
 
       const colorMap = {
-        PRESENT: "bg-emerald-500 text-slate-950",
+        PRESENT: "bg-emerald-500 text-white",
         TARDY: "bg-amber-400 text-slate-950",
-        EXCUSED_ABSENCE: "bg-cyan-500 text-slate-950",
+        EXCUSED_ABSENCE: "bg-cyan-500 text-white",
         UNEXCUSED_ABSENCE: "bg-rose-500 text-white font-bold",
       };
-      tile.className += ` ${colorMap[r.attendance_status] || 'bg-slate-700'}`;
+      tile.className += ` ${colorMap[r.attendance_status] || 'bg-slate-400'}`;
       tile.title = `${r.date} (Wk ${r.week_number}): ${r.attendance_status} | LMS: ${r.lms_active_minutes}m`;
 
       grid.appendChild(tile);
@@ -298,6 +431,8 @@ function closeStudentModal() {
 }
 
 function renderStudentTimelineChart(records) {
+  latestTimelineData = records;
+  const theme = getChartColors();
   const labels = records.map(r => `W${r.week_number}-D${r.weekday + 1}`);
   const lmsData = records.map(r => r.lms_active_minutes);
   const quizScores = records.map(r => (r.quiz_score !== null && r.quiz_score > 0) ? r.quiz_score : null);
@@ -314,7 +449,7 @@ function renderStudentTimelineChart(records) {
           label: "Daily LMS Active Minutes",
           data: lmsData,
           borderColor: "#06b6d4",
-          backgroundColor: "rgba(6, 182, 212, 0.1)",
+          backgroundColor: "rgba(6, 182, 212, 0.12)",
           fill: true,
           tension: 0.3,
           pointRadius: 1.5,
@@ -337,15 +472,15 @@ function renderStudentTimelineChart(records) {
       maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
       plugins: {
-        legend: { labels: { color: "#94a3b8", font: { size: 10 } } }
+        legend: { labels: { color: theme.legend, font: { size: 10 } } }
       },
       scales: {
-        x: { ticks: { color: "#64748b", font: { size: 9 }, maxTicksLimit: 16 }, grid: { display: false } },
+        x: { ticks: { color: theme.text, font: { size: 9 }, maxTicksLimit: 16 }, grid: { display: false } },
         y: {
           type: "linear",
           position: "left",
           ticks: { color: "#06b6d4", font: { size: 10 } },
-          grid: { color: "#1e293b" },
+          grid: { color: theme.grid },
           title: { display: true, text: "LMS Minutes", color: "#06b6d4", font: { size: 10 } }
         },
         y1: {
@@ -362,7 +497,10 @@ function renderStudentTimelineChart(records) {
   });
 }
 
-// Model Lab & ML Training
+// ==========================================
+// MODEL LAB & ML TRAINING
+// ==========================================
+
 async function fetchModelMetrics() {
   try {
     const res = await fetch("/api/models/current");
@@ -391,12 +529,12 @@ async function fetchModelMetrics() {
       const row = document.createElement("div");
       row.className = "flex items-center justify-between";
       row.innerHTML = `
-        <span class="text-slate-400 truncate max-w-[170px]">${f.feature.replace(/early_/g, "")}</span>
+        <span class="text-slate-600 dark:text-slate-400 truncate max-w-[170px]">${f.feature.replace(/early_/g, "")}</span>
         <div class="flex items-center space-x-2 w-28">
-          <div class="flex-1 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-            <div class="bg-emerald-400 h-full rounded-full" style="width: ${pct}%"></div>
+          <div class="flex-1 bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
           </div>
-          <span class="text-emerald-400 w-8 text-right font-mono">${pct}%</span>
+          <span class="text-emerald-600 dark:text-emerald-400 w-8 text-right font-mono font-semibold">${pct}%</span>
         </div>
       `;
       fiContainer.appendChild(row);
@@ -430,6 +568,8 @@ async function trainMLModel() {
 
 function renderRocCurve(rocPoints, aucVal) {
   if (!rocPoints || rocPoints.length === 0) return;
+  latestRocData = { points: rocPoints, auc: aucVal };
+  const theme = getChartColors();
 
   const dataPoints = rocPoints.map(p => ({ x: p.fpr, y: p.tpr }));
 
@@ -452,7 +592,7 @@ function renderRocCurve(rocPoints, aucVal) {
         {
           label: "Random Chance (AUC = 0.50)",
           data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
-          borderColor: "#64748b",
+          borderColor: theme.text,
           borderDash: [5, 5],
           pointRadius: 0,
         }
@@ -462,23 +602,23 @@ function renderRocCurve(rocPoints, aucVal) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: "#94a3b8", font: { size: 10 } } }
+        legend: { labels: { color: theme.legend, font: { size: 10 } } }
       },
       scales: {
         x: {
           type: "linear",
           min: 0,
           max: 1,
-          title: { display: true, text: "False Positive Rate (1 - Specificity)", color: "#94a3b8", font: { size: 10 } },
-          ticks: { color: "#64748b" },
-          grid: { color: "#1e293b" }
+          title: { display: true, text: "False Positive Rate (1 - Specificity)", color: theme.legend, font: { size: 10 } },
+          ticks: { color: theme.text },
+          grid: { color: theme.grid }
         },
         y: {
           min: 0,
           max: 1,
-          title: { display: true, text: "True Positive Rate (Sensitivity / Recall)", color: "#94a3b8", font: { size: 10 } },
-          ticks: { color: "#64748b" },
-          grid: { color: "#1e293b" }
+          title: { display: true, text: "True Positive Rate (Sensitivity / Recall)", color: theme.legend, font: { size: 10 } },
+          ticks: { color: theme.text },
+          grid: { color: theme.grid }
         }
       }
     }
@@ -521,10 +661,10 @@ async function runLiveInference() {
     document.getElementById("simActionText").innerText = result.recommended_action;
 
     const tierColors = {
-      CRITICAL: "bg-rose-500/20 text-rose-300",
-      ELEVATED: "bg-amber-500/20 text-amber-300",
-      MODERATE: "bg-cyan-500/20 text-cyan-300",
-      LOW: "bg-emerald-500/20 text-emerald-300",
+      CRITICAL: "bg-rose-500/20 text-rose-600 dark:text-rose-300",
+      ELEVATED: "bg-amber-500/20 text-amber-600 dark:text-amber-300",
+      MODERATE: "bg-cyan-500/20 text-cyan-600 dark:text-cyan-300",
+      LOW: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300",
     };
     document.getElementById("simTierBadge").className = `ml-3 px-2 py-0.5 rounded text-xs font-semibold ${tierColors[result.predicted_risk_tier] || ''}`;
   } catch (err) {
@@ -532,7 +672,10 @@ async function runLiveInference() {
   }
 }
 
-// Privacy & Fidelity Audit
+// ==========================================
+// PRIVACY & FIDELITY AUDIT
+// ==========================================
+
 async function loadPrivacyAndFidelity() {
   try {
     const [privRes, fidRes] = await Promise.all([
@@ -550,21 +693,21 @@ async function loadPrivacyAndFidelity() {
       const dpBox = document.getElementById("dpPreviewBox");
       const dp = priv.differential_privacy_preview;
       dpBox.innerHTML = `
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between text-slate-700 dark:text-slate-300">
           <span>Cohort Count (Laplace Noisy):</span>
-          <span class="text-cyan-400 font-bold">${dp.total_students} STUs</span>
+          <span class="text-cyan-600 dark:text-cyan-400 font-bold">${dp.total_students} STUs</span>
         </div>
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between text-slate-700 dark:text-slate-300">
           <span>Chronic Count (DP Sanitized):</span>
-          <span class="text-rose-400 font-bold">${dp.chronic_absenteeism_count} STUs</span>
+          <span class="text-rose-600 dark:text-rose-400 font-bold">${dp.chronic_absenteeism_count} STUs</span>
         </div>
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between text-slate-700 dark:text-slate-300">
           <span>Mean Attendance (DP ε=1.0):</span>
-          <span class="text-emerald-400 font-bold">${(dp.average_attendance_rate * 100).toFixed(1)}%</span>
+          <span class="text-emerald-600 dark:text-emerald-400 font-bold">${(dp.average_attendance_rate * 100).toFixed(1)}%</span>
         </div>
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between text-slate-700 dark:text-slate-300">
           <span>Mean Daily LMS Time (DP):</span>
-          <span class="text-cyan-400 font-bold">${dp.average_daily_lms_minutes} mins</span>
+          <span class="text-cyan-600 dark:text-cyan-400 font-bold">${dp.average_daily_lms_minutes} mins</span>
         </div>
       `;
     }
@@ -590,18 +733,20 @@ async function loadPrivacyAndFidelity() {
       const feats = ["Attn", "LMS", "Subm", "Quiz"];
 
       // Header row
-      let headerTr = `<tr><th class="p-1.5 text-slate-500 bg-slate-950"></th>`;
-      feats.forEach(f => { headerTr += `<th class="p-1.5 text-slate-400 bg-slate-950">${f}</th>`; });
+      let headerTr = `<tr><th class="p-1.5 text-slate-500 bg-slate-100 dark:bg-slate-950"></th>`;
+      feats.forEach(f => { headerTr += `<th class="p-1.5 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-950">${f}</th>`; });
       headerTr += `</tr>`;
       cTable.innerHTML += headerTr;
 
       // Matrix rows
       fid.correlations.matrix.forEach((row, idx) => {
-        let tr = `<tr><th class="p-1.5 text-slate-400 bg-slate-950 text-left">${feats[idx]}</th>`;
+        let tr = `<tr><th class="p-1.5 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-950 text-left">${feats[idx]}</th>`;
         row.forEach(val => {
           const isDiag = Math.abs(val - 1.0) < 0.01;
-          const colorClass = isDiag ? 'text-slate-500 font-normal' : (val > 0.4 ? 'text-emerald-400 font-bold' : 'text-slate-300');
-          tr += `<td class="p-1.5 bg-slate-900 border border-slate-800 ${colorClass}">${val.toFixed(2)}</td>`;
+          const colorClass = isDiag
+            ? 'text-slate-400 dark:text-slate-500 font-normal'
+            : (val > 0.4 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-700 dark:text-slate-300');
+          tr += `<td class="p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 ${colorClass}">${val.toFixed(2)}</td>`;
         });
         tr += `</tr>`;
         cTable.innerHTML += tr;
@@ -612,7 +757,10 @@ async function loadPrivacyAndFidelity() {
   }
 }
 
-// What-If Policy Simulation
+// ==========================================
+// WHAT-IF POLICY SIMULATION
+// ==========================================
+
 async function runPolicySimulation() {
   const policyName = document.getElementById("simPolicySelect").value;
   const intensity = parseFloat(document.getElementById("simIntensity").value);
@@ -638,7 +786,10 @@ async function runPolicySimulation() {
   }
 }
 
-// Generator Controls & Preset Application
+// ==========================================
+// GENERATOR CONTROLS & PRESET APPLICATION
+// ==========================================
+
 function applyPreset(presetName) {
   if (presetName === "standard_district") {
     document.getElementById("genStudents").value = 250;
@@ -721,4 +872,3 @@ async function runGeneration() {
     btn.disabled = false;
   }
 }
-
