@@ -50,3 +50,4 @@ def get_db_stats_raw() -> dict:
         "size_kb": round(size_bytes / 1024, 1),
         "size_mb": round(size_bytes / (1024 * 1024), 2),
     }
+

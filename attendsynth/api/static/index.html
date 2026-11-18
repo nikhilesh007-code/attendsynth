@@ -17,34 +17,37 @@
     })();
   </script>
 
+  <!-- Tailwind configuration must be defined BEFORE the Tailwind CDN script runs -->
+  <script>
+    window.tailwind = {
+      config: {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              brand: {
+                50: '#f0fdf4',
+                100: '#dcfce7',
+                500: '#22c55e',
+                600: '#16a34a',
+                700: '#15803d',
+              }
+            }
+          }
+        }
+      }
+    };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/static/css/style.css?v=2.2">
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans min-h-screen flex antialiased selection:bg-emerald-500 selection:text-white">
 
@@ -994,6 +997,6 @@
 
   </div>
 
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.js?v=2.2"></script>
 </body>
 </html>

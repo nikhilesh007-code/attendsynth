@@ -125,3 +125,4 @@ class MLModelRecord(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     cohort = relationship("CohortModel", back_populates="trained_models")
+

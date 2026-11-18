@@ -28,22 +28,30 @@ async function initDashboard() {
 // ==========================================
 
 async function loadCohortsList() {
+  const select = document.getElementById("activeCohortSelect");
   try {
     const res = await fetch("/api/cohorts");
-    if (!res.ok) return;
+    if (!res.ok) {
+      if (select) select.innerHTML = '<option value="">(Server offline)</option>';
+      return;
+    }
     const cohorts = await res.json();
-    const select = document.getElementById("activeCohortSelect");
     if (!select) return;
+    if (cohorts.length === 0) {
+      select.innerHTML = '<option value="">No cohorts in DB yet</option>';
+      return;
+    }
     select.innerHTML = "";
     cohorts.forEach(c => {
       const opt = document.createElement("option");
-      opt.value = c.cohort_id;
-      opt.innerText = `${c.cohort_name} (${c.student_count} STUs • ${c.total_weeks} Wks)`;
+      opt.value = c.cohort_id || c.id;
+      opt.innerText = `${c.cohort_name || c.name} (${c.student_count || c.num_students} STUs • ${c.total_weeks} Wks)`;
       if (c.is_active) opt.selected = true;
       select.appendChild(opt);
     });
   } catch (err) {
     console.error("Error loading cohorts from DB:", err);
+    if (select) select.innerHTML = '<option value="">(Error connecting to DB)</option>';
   }
 }
 
@@ -72,9 +80,23 @@ async function loadDbStats() {
     if (tally) {
       tally.innerText = `SQLite DB: ${stats.total_students} STUs (${stats.total_daily_records.toLocaleString()} rows • ${stats.db_file_size_kb} KB)`;
     }
+    const summaryBanner = document.getElementById("dbTallySummary");
+    if (summaryBanner) {
+      summaryBanner.innerText = `${stats.total_cohorts} Cohort${stats.total_cohorts !== 1 ? 's' : ''} • ${stats.total_students} Students • ${stats.total_daily_records.toLocaleString()} Daily Records`;
+    }
+    const fileLabel = document.getElementById("dbFilePathLabel");
+    if (fileLabel) {
+      fileLabel.innerText = "attendsynth.db";
+    }
   } catch (err) {
     console.error("Error loading DB stats:", err);
   }
+}
+
+async function refreshDbStats() {
+  await loadDbStats();
+  await loadCohortsList();
+  await fetchCohortSummary();
 }
 
 // ==========================================
@@ -99,7 +121,11 @@ function toggleTheme() {
   }
 
   updateThemeUI(newDark);
-  updateChartsTheme();
+  try {
+    updateChartsTheme();
+  } catch (e) {
+    console.warn("Chart theme update:", e);
+  }
 }
 
 function updateThemeUI(isDark) {
