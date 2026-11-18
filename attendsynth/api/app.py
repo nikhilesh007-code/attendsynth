@@ -1,12 +1,13 @@
-"""FastAPI REST API backend for AttendSynth AI."""
+"""FastAPI REST API backend for AttendSynth AI with SQLite database persistence."""
 
 import os
 from typing import Any, Dict, List, Optional
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, HTTPException, Query, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 from attendsynth.config import ArchetypeType, CohortConfig, Presets, SchoolCalendarConfig
 from attendsynth.generator import AttendSynthGenerator
@@ -16,14 +17,17 @@ from attendsynth.models.early_warning import EarlyWarningPredictor
 from attendsynth.simulator import PolicySimulator
 from attendsynth.export import DataExporter
 
+from attendsynth.db.database import get_db, init_db, SessionLocal
+from attendsynth.db.repository import CohortRepository
+
 # Initialize FastAPI application
 app = FastAPI(
     title="AttendSynth AI API",
-    description="Synthetic Student Engagement & Attendance Generator for Early-Warning Predictive Models",
+    description="Synthetic Student Engagement & Attendance Generator with SQLite Relational Persistence",
     version="1.0.0",
 )
 
-# Enable CORS for developer ease
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,13 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global in-memory application state
-GLOBAL_STATE: Dict[str, Any] = {
-    "current_cohort": None,
-    "current_model": None,
-    "privacy_auditor": PrivacyAuditor(k_threshold=5),
-    "fidelity_evaluator": FidelityEvaluator(),
-}
+# In-memory helper evaluators
+PRIVACY_AUDITOR = PrivacyAuditor(k_threshold=5)
+FIDELITY_EVALUATOR = FidelityEvaluator()
 
 
 class GenerateRequest(BaseModel):
@@ -54,7 +54,7 @@ class GenerateRequest(BaseModel):
 
 class TrainModelRequest(BaseModel):
     model_config = {"protected_namespaces": ()}
-    model_type: str = Field(default="random_forest")  # random_forest, gradient_boosting, logistic_regression
+    model_type: str = Field(default="random_forest")
     observation_weeks: int = Field(default=6, ge=2, le=12)
 
 
@@ -76,26 +76,50 @@ class PolicySimRequest(BaseModel):
 
 @app.on_event("startup")
 def startup_event():
-    """Generates an initial default cohort and baseline model on boot so the UI is immediately interactive."""
-    gen = AttendSynthGenerator(Presets.standard_district(num_students=200, seed=42))
-    cohort = gen.generate()
-    GLOBAL_STATE["current_cohort"] = cohort
-    
-    # Pre-train a default model
-    predictor = EarlyWarningPredictor(model_type="random_forest", observation_weeks=6)
-    predictor.train_and_evaluate(cohort)
-    GLOBAL_STATE["current_model"] = predictor
+    """Initializes the SQLite database and ensures at least one cohort exists in the database."""
+    init_db()
+    db = SessionLocal()
+    try:
+        active = CohortRepository.get_active_cohort(db)
+        if not active:
+            # Generate and persist an initial benchmark cohort into SQLite
+            gen = AttendSynthGenerator(Presets.standard_district(num_students=200, seed=42))
+            cohort_data = gen.generate()
+            saved_cohort = CohortRepository.save_cohort(db, cohort_data)
+
+            # Pre-train baseline early warning model and store in DB
+            predictor = EarlyWarningPredictor(model_type="random_forest", observation_weeks=6)
+            metrics = predictor.train_and_evaluate(cohort_data)
+            CohortRepository.save_trained_model(db, saved_cohort.id, metrics)
+    finally:
+        db.close()
+
+
+def _resolve_session(db: Any) -> Session:
+    """Helper ensuring endpoints work both when called via FastAPI HTTP router and directly in unit tests."""
+    if db is None or not hasattr(db, "query"):
+        return SessionLocal()
+    return db
 
 
 @app.get("/api/health")
-def health_check():
+def health_check(db: Session = Depends(get_db)):
+    db = _resolve_session(db)
+    stats = CohortRepository.get_database_stats(db)
     return {
         "status": "healthy",
         "service": "AttendSynth AI",
         "version": "1.0.0",
-        "cohort_loaded": GLOBAL_STATE["current_cohort"] is not None,
-        "model_trained": GLOBAL_STATE["current_model"] is not None and GLOBAL_STATE["current_model"].is_trained,
+        "cohort_loaded": stats["total_cohorts"] > 0,
+        "database": stats,
     }
+
+
+@app.get("/api/db/stats")
+def get_db_stats(db: Session = Depends(get_db)):
+    """Returns real-time database connection metrics and record tallies."""
+    db = _resolve_session(db)
+    return CohortRepository.get_database_stats(db)
 
 
 @app.get("/api/presets")
@@ -122,8 +146,37 @@ def get_presets():
     ]
 
 
+@app.get("/api/cohorts")
+def list_cohorts(db: Session = Depends(get_db)):
+    """Lists all cohorts stored in the database."""
+    db = _resolve_session(db)
+    return CohortRepository.list_cohorts(db)
+
+
+@app.post("/api/cohorts/select/{cohort_id}")
+def select_active_cohort(cohort_id: str, db: Session = Depends(get_db)):
+    """Switches the active cohort in the database."""
+    db = _resolve_session(db)
+    target = CohortRepository.set_active_cohort(db, cohort_id)
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Cohort {cohort_id} not found in database.")
+    return {"success": True, "active_cohort_id": target.id, "name": target.name}
+
+
+@app.delete("/api/cohorts/{cohort_id}")
+def delete_cohort(cohort_id: str, db: Session = Depends(get_db)):
+    """Deletes a cohort and all its associated students and telemetry from the database."""
+    db = _resolve_session(db)
+    success = CohortRepository.delete_cohort(db, cohort_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Cohort not found.")
+    return {"success": True, "deleted_cohort_id": cohort_id}
+
+
 @app.post("/api/generate")
-def generate_cohort(req: GenerateRequest):
+def generate_cohort(req: GenerateRequest, db: Session = Depends(get_db)):
+    """Synthesizes a new cohort and writes all records directly into the SQLite database."""
+    db = _resolve_session(db)
     cal = SchoolCalendarConfig(
         total_weeks=req.total_weeks,
         district_name=req.district_name,
@@ -144,8 +197,8 @@ def generate_cohort(req: GenerateRequest):
                 except ValueError:
                     pass
         cfg = CohortConfig(
-            cohort_id=f"cohort_{req.random_seed}_{req.num_students}",
-            name=f"Synthesized Cohort ({req.num_students} Students)",
+            cohort_id=f"cohort_{req.random_seed}_{req.num_students}_{req.total_weeks}w",
+            name=f"Synthesized Cohort ({req.num_students} Students, {req.total_weeks} Wks)",
             num_students=req.num_students,
             random_seed=req.random_seed,
             calendar=cal,
@@ -155,33 +208,43 @@ def generate_cohort(req: GenerateRequest):
         if weights:
             cfg.archetype_weights = weights
 
+    # 1. Run dynamic algorithmic generator
     generator = AttendSynthGenerator(cfg)
-    cohort = generator.generate()
-    GLOBAL_STATE["current_cohort"] = cohort
+    cohort_data = generator.generate()
 
-    # Re-train model on the newly generated cohort automatically
+    # 2. Persist into SQLite Database
+    saved_cohort = CohortRepository.save_cohort(db, cohort_data)
+
+    # 3. Train and persist EWS model
     predictor = EarlyWarningPredictor(model_type="random_forest", observation_weeks=6)
-    predictor.train_and_evaluate(cohort)
-    GLOBAL_STATE["current_model"] = predictor
+    metrics = predictor.train_and_evaluate(cohort_data)
+    CohortRepository.save_trained_model(db, saved_cohort.id, metrics)
+
+    db_stats = CohortRepository.get_database_stats(db)
 
     return {
         "success": True,
-        "message": f"Successfully synthesized cohort with {req.num_students} students over {req.total_weeks} weeks.",
-        "cohort_id": cohort["cohort_id"],
-        "summary": cohort["summary"],
+        "message": f"Successfully synthesized and persisted {req.num_students} students and {len(cohort_data['daily_records'])} daily logs to SQLite database.",
+        "cohort_id": saved_cohort.id,
+        "summary": cohort_data["summary"],
+        "database": db_stats,
     }
 
 
 @app.get("/api/cohorts/current")
-def get_current_cohort_summary():
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort generated yet.")
+def get_current_cohort_summary(db: Session = Depends(get_db)):
+    """Returns active cohort summary from SQLite database."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No cohorts found in database.")
+
+    import json
     return {
-        "cohort_id": cohort["cohort_id"],
-        "cohort_name": cohort["cohort_name"],
-        "config": cohort["config"],
-        "summary": cohort["summary"],
+        "cohort_id": active.id,
+        "cohort_name": active.name,
+        "config": json.loads(active.config_json),
+        "summary": json.loads(active.summary_json),
     }
 
 
@@ -192,77 +255,70 @@ def get_students(
     search: Optional[str] = None,
     risk_level: Optional[str] = None,
     archetype: Optional[str] = None,
+    db: Session = Depends(get_db),
 ):
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort generated yet.")
+    """Executes SQL query on the 'students' table with filtering, search, and pagination."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No active cohort in database.")
 
-    students = cohort.get("students", [])
-
-    # Filters
-    filtered = students
-    if search:
-        search_lower = search.lower()
-        filtered = [
-            s for s in filtered
-            if search_lower in s["display_name"].lower() or search_lower in s["student_id"].lower()
-        ]
-    if risk_level and risk_level != "ALL":
-        filtered = [s for s in filtered if s["risk_level"] == risk_level]
-    if archetype and archetype != "ALL":
-        filtered = [s for s in filtered if s["archetype"] == archetype]
-
-    total_count = len(filtered)
-    start_idx = (page - 1) * limit
-    end_idx = start_idx + limit
-    page_items = filtered[start_idx:end_idx]
+    students, total_count = CohortRepository.query_students(
+        db,
+        cohort_id=active.id,
+        page=page,
+        limit=limit,
+        search=search,
+        risk_level=risk_level,
+        archetype=archetype,
+    )
 
     return {
         "total": total_count,
         "page": page,
         "limit": limit,
-        "students": page_items,
+        "students": students,
     }
 
 
 @app.get("/api/cohorts/current/students/{student_id}")
-def get_student_detail(student_id: str):
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort generated yet.")
+def get_student_detail(student_id: str, db: Session = Depends(get_db)):
+    """Queries single student and their daily attendance timeline from the SQLite database."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No active cohort in database.")
 
-    students = cohort.get("students", [])
-    student = next((s for s in students if s["student_id"] == student_id), None)
-    if not student:
-        raise HTTPException(status_code=404, detail=f"Student {student_id} not found.")
+    detail = CohortRepository.get_student_detail(db, active.id, student_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Student {student_id} not found in database.")
 
-    # Fetch daily logs
-    daily_records = [
-        r for r in cohort.get("daily_records", [])
-        if r["student_id"] == student_id
-    ]
-
-    return {
-        "student": student,
-        "daily_timeline": daily_records,
-    }
+    return detail
 
 
 @app.post("/api/models/train")
-def train_model(req: TrainModelRequest):
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=400, detail="Generate a cohort before training.")
+def train_model(req: TrainModelRequest, db: Session = Depends(get_db)):
+    """Trains an EWS model on the active database cohort and persists model metrics into SQLite."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=400, detail="No active cohort in database to train on.")
+
+    cohort_payload = CohortRepository.get_full_cohort_payload(db, active.id)
+    if not cohort_payload:
+        raise HTTPException(status_code=404, detail="Could not reconstruct cohort from database.")
 
     predictor = EarlyWarningPredictor(
         model_type=req.model_type,
         observation_weeks=req.observation_weeks,
     )
-    results = predictor.train_and_evaluate(cohort)
+    results = predictor.train_and_evaluate(cohort_payload)
     if "error" in results:
         raise HTTPException(status_code=400, detail=results["error"])
 
-    GLOBAL_STATE["current_model"] = predictor
+    # Persist model evaluation metrics in DB
+    CohortRepository.save_trained_model(db, active.id, results)
+
     return {
         "success": True,
         "metrics": results,
@@ -270,36 +326,55 @@ def train_model(req: TrainModelRequest):
 
 
 @app.get("/api/models/current")
-def get_current_model_metrics():
-    model: Optional[EarlyWarningPredictor] = GLOBAL_STATE.get("current_model")
-    if not model or not model.is_trained:
-        raise HTTPException(status_code=404, detail="No early warning model trained yet.")
-    return model.evaluation_metrics
+def get_current_model_metrics(db: Session = Depends(get_db)):
+    """Fetches the latest trained ML model metrics from the database."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    cohort_id = active.id if active else "default"
+    metrics = CohortRepository.get_latest_model(db, cohort_id)
+    if not metrics:
+        raise HTTPException(status_code=404, detail="No trained model found in database.")
+    return metrics
 
 
 @app.post("/api/models/predict")
-def predict_student_risk(req: PredictRiskRequest):
-    model: Optional[EarlyWarningPredictor] = GLOBAL_STATE.get("current_model")
-    if not model or not model.is_trained:
-        raise HTTPException(status_code=400, detail="Train a model first before running inference.")
-    
-    features = req.model_dump()
-    result = model.predict_risk(features)
+def predict_student_risk(req: PredictRiskRequest, db: Session = Depends(get_db)):
+    """Inference endpoint scoring student risk using the trained model."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    cohort_id = active.id if active else "default"
+    model_metrics = CohortRepository.get_latest_model(db, cohort_id)
+
+    # Re-initialize predictor for inference
+    predictor = EarlyWarningPredictor(
+        model_type=model_metrics.get("model_type", "random_forest") if model_metrics else "random_forest",
+        observation_weeks=model_metrics.get("observation_weeks", 6) if model_metrics else 6,
+    )
+
+    if active:
+        cohort_payload = CohortRepository.get_full_cohort_payload(db, active.id)
+        if cohort_payload:
+            predictor.train_and_evaluate(cohort_payload)
+
+    result = predictor.predict_risk(req.model_dump())
     return result
 
 
 @app.get("/api/audit/privacy")
-def audit_privacy():
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort loaded.")
+def audit_privacy(db: Session = Depends(get_db)):
+    """Runs privacy and k-anonymity audit on actual database records."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No active cohort loaded.")
 
-    auditor: PrivacyAuditor = GLOBAL_STATE["privacy_auditor"]
-    audit_report = auditor.audit_cohort(cohort.get("students", []))
+    students, _ = CohortRepository.query_students(db, active.id, page=1, limit=10000)
+    audit_report = PRIVACY_AUDITOR.audit_cohort(students)
 
-    # Also compute differential privacy noisy release preview
+    import json
+    summary = json.loads(active.summary_json)
     dp_engine = DifferentialPrivacyEngine(epsilon=1.0)
-    dp_sample = dp_engine.privatize_summary(cohort.get("summary", {}), len(cohort.get("students", [])))
+    dp_sample = dp_engine.privatize_summary(summary, len(students))
 
     return {
         "audit": audit_report,
@@ -308,24 +383,29 @@ def audit_privacy():
 
 
 @app.get("/api/audit/fidelity")
-def audit_fidelity():
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort loaded.")
+def audit_fidelity(db: Session = Depends(get_db)):
+    """Runs statistical fidelity evaluation on actual database records."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No active cohort loaded.")
 
-    evaluator: FidelityEvaluator = GLOBAL_STATE["fidelity_evaluator"]
-    report = evaluator.evaluate(cohort.get("students", []))
+    students, _ = CohortRepository.query_students(db, active.id, page=1, limit=10000)
+    report = FIDELITY_EVALUATOR.evaluate(students)
     return report
 
 
 @app.post("/api/simulate/policy")
-def simulate_policy(req: PolicySimRequest):
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=400, detail="Generate a cohort first.")
+def simulate_policy(req: PolicySimRequest, db: Session = Depends(get_db)):
+    """Simulates district policy intervention on actual database cohort."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=400, detail="No active cohort in database.")
 
+    cohort_payload = CohortRepository.get_full_cohort_payload(db, active.id)
     res = PolicySimulator.simulate_policy_intervention(
-        base_cohort=cohort,
+        base_cohort=cohort_payload,
         policy_name=req.policy_name,
         intervention_intensity=req.intervention_intensity,
     )
@@ -333,27 +413,31 @@ def simulate_policy(req: PolicySimRequest):
 
 
 @app.get("/api/export/{export_format}")
-def export_data(export_format: str):
-    cohort = GLOBAL_STATE.get("current_cohort")
-    if not cohort:
-        raise HTTPException(status_code=404, detail="No cohort to export.")
+def export_data(export_format: str, db: Session = Depends(get_db)):
+    """Exports dataset directly from SQLite database."""
+    db = _resolve_session(db)
+    active = CohortRepository.get_active_cohort(db)
+    if not active:
+        raise HTTPException(status_code=404, detail="No active cohort to export.")
+
+    cohort_payload = CohortRepository.get_full_cohort_payload(db, active.id)
 
     if export_format == "students_csv":
-        csv_text = DataExporter.to_csv_students(cohort.get("students", []))
+        csv_text = DataExporter.to_csv_students(cohort_payload.get("students", []))
         return Response(
             content=csv_text,
             media_type="text/csv",
             headers={"Content-Disposition": "attachment; filename=attendsynth_students.csv"},
         )
     elif export_format == "daily_csv":
-        csv_text = DataExporter.to_csv_daily_records(cohort.get("daily_records", []))
+        csv_text = DataExporter.to_csv_daily_records(cohort_payload.get("daily_records", []))
         return Response(
             content=csv_text,
             media_type="text/csv",
             headers={"Content-Disposition": "attachment; filename=attendsynth_daily_attendance.csv"},
         )
     elif export_format == "edfi_json":
-        json_text = DataExporter.to_ed_fi_json(cohort)
+        json_text = DataExporter.to_ed_fi_json(cohort_payload)
         return Response(
             content=json_text,
             media_type="application/json",
@@ -362,7 +446,7 @@ def export_data(export_format: str):
     elif export_format == "full_json":
         import json
         return Response(
-            content=json.dumps(cohort, indent=2),
+            content=json.dumps(cohort_payload, indent=2),
             media_type="application/json",
             headers={"Content-Disposition": "attachment; filename=attendsynth_full_cohort.json"},
         )

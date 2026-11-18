@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AttendSynth AI - Synthetic Student Engagement Generator</title>
+  <title>AttendSynth AI - Synthetic Student Engagement & Early-Warning Platform</title>
   
   <!-- Check theme before render to avoid flash of wrong theme -->
   <script>
@@ -64,7 +64,7 @@
         </div>
         <div class="sidebar-header-text flex flex-col whitespace-nowrap overflow-hidden">
           <span class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400 bg-clip-text text-transparent">AttendSynth AI</span>
-          <span class="text-[10px] text-slate-600 dark:text-slate-400 font-mono">v1.0 • FERPA Safe</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Enterprise • FERPA Compliant</span>
         </div>
       </div>
       <!-- Mobile Close Button -->
@@ -75,68 +75,68 @@
       </button>
     </div>
 
-    <!-- Navigation Items -->
+    <!-- Navigation Items without double icons -->
     <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
       
       <!-- Overview -->
-      <button onclick="switchTab('overview')" id="tab-overview" data-tooltip="📊 Overview" class="sidebar-item nav-tab active-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('overview')" id="tab-overview" data-tooltip="Overview" class="sidebar-item nav-tab active-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">📊 Overview</span>
+        <span class="sidebar-label whitespace-nowrap">Overview</span>
       </button>
 
       <!-- Generator Studio -->
-      <button onclick="switchTab('generator')" id="tab-generator" data-tooltip="🧪 Generator Studio" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('generator')" id="tab-generator" data-tooltip="Generator Studio" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">🧪 Generator Studio</span>
+        <span class="sidebar-label whitespace-nowrap">Generator Studio</span>
       </button>
 
       <!-- Student Cohort Explorer -->
-      <button onclick="switchTab('students')" id="tab-students" data-tooltip="👥 Student Cohort" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('students')" id="tab-students" data-tooltip="Student Cohort" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">👥 Student Cohort</span>
+        <span class="sidebar-label whitespace-nowrap">Student Cohort</span>
       </button>
 
       <!-- Early-Warning ML Lab -->
-      <button onclick="switchTab('modelLab')" id="tab-modelLab" data-tooltip="🤖 Early-Warning ML Lab" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('modelLab')" id="tab-modelLab" data-tooltip="Early-Warning ML Lab" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">🤖 Early-Warning ML</span>
+        <span class="sidebar-label whitespace-nowrap">Early-Warning ML</span>
       </button>
 
       <!-- Privacy & Fidelity Auditor -->
-      <button onclick="switchTab('privacyAudit')" id="tab-privacyAudit" data-tooltip="🛡️ Privacy & Fidelity" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('privacyAudit')" id="tab-privacyAudit" data-tooltip="Privacy & Fidelity" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">🛡️ Privacy & Fidelity</span>
+        <span class="sidebar-label whitespace-nowrap">Privacy & Fidelity</span>
       </button>
 
       <!-- What-If Simulator -->
-      <button onclick="switchTab('simulator')" id="tab-simulator" data-tooltip="🔮 What-If Simulator" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('simulator')" id="tab-simulator" data-tooltip="What-If Simulator" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">🔮 What-If Simulator</span>
+        <span class="sidebar-label whitespace-nowrap">What-If Simulator</span>
       </button>
 
       <!-- Export & Ed-Fi -->
-      <button onclick="switchTab('export')" id="tab-export" data-tooltip="💾 Export & Ed-Fi" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
+      <button onclick="switchTab('export')" id="tab-export" data-tooltip="Export & Ed-Fi" class="sidebar-item nav-tab w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 relative group">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
         </svg>
-        <span class="sidebar-label whitespace-nowrap">💾 Export & Ed-Fi</span>
+        <span class="sidebar-label whitespace-nowrap">Export & Ed-Fi</span>
       </button>
 
     </nav>
 
-    <!-- Sidebar Bottom: Collapse Toggle & Info -->
+    <!-- Sidebar Bottom: Collapse Toggle -->
     <div class="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
       <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/50 transition-all">
         <svg class="w-4 h-4 sidebar-toggle-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@
     <!-- TOP NAVBAR -->
     <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-20 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       
-      <!-- Left side of top bar -->
+      <!-- Left side of top bar: Cohort Selector & District -->
       <div class="flex items-center space-x-3">
         <!-- Hamburger button for mobile -->
         <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -162,22 +162,29 @@
           </svg>
         </button>
 
-        <div class="flex flex-col">
-          <span id="activeDistrictBadge" class="text-xs font-medium text-slate-600 dark:text-slate-300">Horizon Metro Public Schools</span>
-          <span id="activeCohortBadge" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">Loading cohort...</span>
+        <div class="flex items-center space-x-2">
+          <!-- Active Cohort Dropdown Selector (Direct DB Connection) -->
+          <div class="flex flex-col">
+            <span id="activeDistrictBadge" class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Horizon Metro Public Schools</span>
+            <div class="flex items-center space-x-2">
+              <select id="activeCohortSelect" onchange="switchCohortFromDropdown(this.value)" class="text-xs font-mono font-bold bg-transparent text-emerald-600 dark:text-emerald-400 border-none focus:outline-none cursor-pointer pr-4 hover:underline">
+                <option value="">Loading cohorts from DB...</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Right side controls -->
+      <!-- Right side controls: DB Status & Theme Switcher -->
       <div class="flex items-center space-x-3 sm:space-x-4">
         
-        <!-- Engine Online Pulse -->
-        <div class="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono">
+        <!-- SQLite DB Status Pill -->
+        <div id="dbStatusBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-700 dark:text-slate-300 shadow-sm" title="Connected to local SQLite database">
           <span class="flex h-2 w-2 relative">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span>Engine Online</span>
+          <span id="dbTallyText">DB: Connected</span>
         </div>
 
         <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
@@ -195,16 +202,6 @@
           <span id="themeBtnText" class="font-mono text-[11px] hidden sm:inline">Theme: Dark</span>
         </button>
 
-        <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
-
-        <!-- GitHub Profile Link -->
-        <a href="https://github.com/nikhilesh007-code" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-xs font-medium transition-all shadow-sm">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
-          </svg>
-          <span class="font-mono text-[11px] hidden sm:inline">@nikhilesh007-code</span>
-        </a>
-
       </div>
     </header>
 
@@ -218,7 +215,7 @@
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
             <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Cohort Students</div>
             <div id="kpiTotalStudents" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 font-mono">--</div>
-            <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center">Synthetic &bull; Non-PII</div>
+            <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center font-medium">SQLite DB Verified</div>
           </div>
 
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm relative overflow-hidden">
@@ -249,6 +246,24 @@
             <div class="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Privacy Rating</div>
             <div class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 font-mono">A+</div>
             <div class="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-1">FERPA & k-Anon Validated</div>
+          </div>
+        </div>
+
+        <!-- Database Persistence Bar -->
+        <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-xs gap-3">
+          <div class="flex items-center space-x-2 text-slate-600 dark:text-slate-400 font-mono">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span>Database Store: <strong id="dbFilePathLabel" class="text-slate-800 dark:text-slate-200">attendsynth.db</strong></span>
+            <span class="hidden md:inline">&bull;</span>
+            <span id="dbTallySummary" class="hidden md:inline text-emerald-600 dark:text-emerald-400 font-bold">1 Cohort &bull; 200 Students &bull; 16,000 Daily Records</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="refreshDbStats()" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 font-medium transition-all">
+              Sync DB Status
+            </button>
+            <button onclick="switchTab('generator')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-all">
+              + Generate New Cohort
+            </button>
           </div>
         </div>
 
@@ -306,7 +321,7 @@
               </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-              <span class="text-xs text-slate-500 dark:text-slate-400">Generate custom cohort:</span>
+              <span class="text-xs text-slate-500 dark:text-slate-400">Configure new cohort:</span>
               <button onclick="switchTab('generator')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all">
                 Open Studio &rarr;
               </button>
@@ -318,11 +333,16 @@
       <!-- TAB 2: GENERATOR STUDIO -->
       <section id="panel-generator" class="tab-panel hidden space-y-6">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
-            <span>🧪 Synthetic Cohort Generator Studio</span>
-          </h2>
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <span>Synthetic Cohort Generator Studio</span>
+            </h2>
+            <span class="px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Direct SQLite Pipeline
+            </span>
+          </div>
           <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
-            Configure educational context, sample sizes, behavioral distributions, and privacy controls to synthesize realistic attendance and LMS time series.
+            Configure educational context, sample sizes, behavioral distributions, and privacy controls to synthesize realistic attendance and LMS time series saved directly into the database.
           </p>
 
           <!-- Presets Row -->
@@ -352,7 +372,7 @@
                 <input type="range" id="genStudents" min="50" max="1000" step="25" value="250" oninput="document.getElementById('genStudentsVal').innerText = this.value" class="w-full accent-emerald-500">
                 <span id="genStudentsVal" class="text-sm font-mono text-emerald-600 dark:text-emerald-400 font-bold w-12 text-right">250</span>
               </div>
-              <p class="text-xs text-slate-500 mt-1">Number of synthetic students</p>
+              <p class="text-xs text-slate-500 mt-1">Number of synthetic students to generate & insert</p>
             </div>
 
             <div>
@@ -367,13 +387,13 @@
             <div>
               <label class="block text-xs uppercase font-semibold text-slate-500 dark:text-slate-400 mb-1">Random Seed</label>
               <input type="number" id="genSeed" value="42" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
-              <p class="text-xs text-slate-500 mt-1">Ensures 100% reproducible data</p>
+              <p class="text-xs text-slate-500 mt-1">Ensures 100% reproducible statistical synthesis</p>
             </div>
 
             <div>
               <label class="block text-xs uppercase font-semibold text-slate-500 dark:text-slate-400 mb-1">District Identifier</label>
               <input type="text" id="genDistrict" value="Horizon Metro Public Schools" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
-              <p class="text-xs text-slate-500 mt-1">Synthetic education agency name</p>
+              <p class="text-xs text-slate-500 mt-1">Synthetic school district authority</p>
             </div>
           </div>
 
@@ -421,7 +441,7 @@
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
-              <span>Generate Synthetic Cohort</span>
+              <span>Generate & Save into Database</span>
             </button>
           </div>
         </div>
@@ -432,8 +452,8 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 class="text-lg font-bold text-slate-900 dark:text-white">👥 Student Cohort Explorer</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Drill down into individual student longitudinal profiles, attendance records, and early-warning warning flags.</p>
+              <h2 class="text-lg font-bold text-slate-900 dark:text-white">Student Cohort Explorer (SQL Query)</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Queried directly from SQLite <code class="font-mono text-emerald-600 dark:text-emerald-400">students</code> table with server-side pagination & filtering.</p>
             </div>
 
             <!-- Filters -->
@@ -460,23 +480,23 @@
             </div>
           </div>
 
-          <!-- Student Table -->
+          <!-- Student Table with clean column constraints -->
           <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs table-fixed">
               <thead class="bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="py-3 px-4">Student</th>
-                  <th class="py-3 px-3">School & Grade</th>
-                  <th class="py-3 px-3">Archetype</th>
-                  <th class="py-3 px-3">Attendance</th>
-                  <th class="py-3 px-3">LMS Avg</th>
-                  <th class="py-3 px-3">Sub. Rate</th>
-                  <th class="py-3 px-3">Risk Level</th>
-                  <th class="py-3 px-3 text-right">Action</th>
+                  <th class="py-3 px-4 w-[20%]">Student</th>
+                  <th class="py-3 px-3 w-[26%]">School & Grade</th>
+                  <th class="py-3 px-3 w-[20%]">Archetype</th>
+                  <th class="py-3 px-2 w-[10%] text-center">Attendance</th>
+                  <th class="py-3 px-2 w-[8%] text-center">LMS Avg</th>
+                  <th class="py-3 px-2 w-[8%] text-center">Sub. Rate</th>
+                  <th class="py-3 px-2 w-[12%] text-center">Risk Level</th>
+                  <th class="py-3 px-3 w-[8%] text-right">Action</th>
                 </tr>
               </thead>
               <tbody id="studentTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
-                <!-- Rendered dynamically -->
+                <!-- Rendered dynamically from SQLite -->
               </tbody>
             </table>
           </div>
@@ -529,7 +549,7 @@
               </div>
             </div>
             <div id="attendanceGrid" class="flex flex-wrap gap-1.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-              <!-- Day boxes rendered dynamically -->
+              <!-- Day boxes queried from SQLite daily_records -->
             </div>
           </div>
 
@@ -549,7 +569,7 @@
           <!-- Model Configuration & Training Control -->
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-              <span>🤖 Train Early Warning Model</span>
+              <span>Train Early Warning Model</span>
             </h3>
             <p class="text-xs text-slate-600 dark:text-slate-400">
               Train a machine learning classifier using only the first <strong class="text-emerald-600 dark:text-emerald-400">N observation weeks</strong> to predict chronic absenteeism across the entire 16-week semester.
@@ -655,7 +675,7 @@
         <!-- Live Interactive Risk Simulator -->
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
           <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-            <span>🎯 Real-Time Early-Warning Risk Inference Sandbox</span>
+            <span>Real-Time Early-Warning Risk Inference Sandbox</span>
           </h3>
           <p class="text-xs text-slate-600 dark:text-slate-400">
             Tweak early observation signals to see how the trained model calculates chronic absenteeism risk probability and recommends interventions in real-time.
@@ -704,7 +724,7 @@
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-                <span>🛡️ Educational Privacy & FERPA Audit</span>
+                <span>Educational Privacy & FERPA Audit</span>
               </h3>
               <span id="privacyRatingBadge" class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">A+ Validated</span>
             </div>
@@ -757,7 +777,7 @@
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-                <span>📊 Statistical Fidelity & Correlation Preservation</span>
+                <span>Statistical Fidelity & Correlation Preservation</span>
               </h3>
               <span id="fidelityScoreBadge" class="px-2.5 py-1 rounded-md bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30 text-xs font-bold font-mono">SQS: --</span>
             </div>
@@ -809,7 +829,7 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
           <div>
             <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-              <span>🔮 What-If Educational Policy Intervention Simulator</span>
+              <span>What-If Educational Policy Intervention Simulator</span>
             </h2>
             <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
               Evaluate how proactive early interventions (automated guardian nudges, counselor case management, transportation support) alter student trajectory outcomes before deploying in production.
@@ -875,7 +895,7 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
           <div>
             <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-              <span>💾 Data Export & Ed-Fi Standard Alignment</span>
+              <span>Data Export & Ed-Fi Standard Alignment</span>
             </h2>
             <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
               Export the synthetic dataset for data pipelines, model training in external environments, or SIS interoperability benchmarking.
@@ -967,11 +987,9 @@
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- FOOTER: Clean enterprise footer -->
     <footer class="h-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 text-center text-xs text-slate-500 font-mono flex items-center justify-center space-x-2 flex-shrink-0">
-      <span>AttendSynth AI &bull; Synthetic Student Engagement Generator</span>
-      <span>&bull;</span>
-      <span>Created by <a href="https://github.com/nikhilesh007-code" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold">@nikhilesh007-code</a></span>
+      <span>AttendSynth AI &bull; Enterprise Synthetic Student Engagement & Early-Warning Platform &bull; FERPA & COPPA Compliant</span>
     </footer>
 
   </div>

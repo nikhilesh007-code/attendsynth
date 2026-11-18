@@ -15,10 +15,66 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function initDashboard() {
+  await loadCohortsList();
+  await loadDbStats();
   await fetchCohortSummary();
   await loadStudents(1);
   await fetchModelMetrics();
   await loadPrivacyAndFidelity();
+}
+
+// ==========================================
+// SQLITE DATABASE & COHORT MANAGEMENT
+// ==========================================
+
+async function loadCohortsList() {
+  try {
+    const res = await fetch("/api/cohorts");
+    if (!res.ok) return;
+    const cohorts = await res.json();
+    const select = document.getElementById("activeCohortSelect");
+    if (!select) return;
+    select.innerHTML = "";
+    cohorts.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.cohort_id;
+      opt.innerText = `${c.cohort_name} (${c.student_count} STUs • ${c.total_weeks} Wks)`;
+      if (c.is_active) opt.selected = true;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Error loading cohorts from DB:", err);
+  }
+}
+
+async function switchCohortFromDropdown(cohortId) {
+  if (!cohortId) return;
+  try {
+    const res = await fetch(`/api/cohorts/select/${cohortId}`, { method: "POST" });
+    if (res.ok) {
+      await fetchCohortSummary();
+      await loadStudents(1);
+      await fetchModelMetrics();
+      await loadPrivacyAndFidelity();
+      await loadDbStats();
+    }
+  } catch (err) {
+    console.error("Error switching cohort:", err);
+  }
+}
+
+async function loadDbStats() {
+  try {
+    const res = await fetch("/api/db/stats");
+    if (!res.ok) return;
+    const stats = await res.json();
+    const tally = document.getElementById("dbTallyText");
+    if (tally) {
+      tally.innerText = `SQLite DB: ${stats.total_students} STUs (${stats.total_daily_records.toLocaleString()} rows • ${stats.db_file_size_kb} KB)`;
+    }
+  } catch (err) {
+    console.error("Error loading DB stats:", err);
+  }
 }
 
 // ==========================================
@@ -178,19 +234,34 @@ async function fetchCohortSummary() {
     currentCohort = data;
 
     // Update Header
-    document.getElementById("activeCohortBadge").innerText = `${data.cohort_name} (${data.summary.total_students} STUs)`;
+    const activeBadge = document.getElementById("activeCohortBadge");
+    if (activeBadge) {
+      activeBadge.innerText = `${data.cohort_name} (${data.summary.total_students} STUs)`;
+    }
+    const cohortSelect = document.getElementById("activeCohortSelect");
+    if (cohortSelect && data.cohort_id) {
+      cohortSelect.value = data.cohort_id;
+    }
     if (data.config && data.config.district_name) {
-      document.getElementById("activeDistrictBadge").innerText = data.config.district_name;
+      const distBadge = document.getElementById("activeDistrictBadge");
+      if (distBadge) distBadge.innerText = data.config.district_name;
     }
 
-    // Update KPIs
-    document.getElementById("kpiTotalStudents").innerText = data.summary.total_students;
-    document.getElementById("kpiAvgAttendance").innerText = (data.summary.average_attendance_rate * 100).toFixed(1) + "%";
-    document.getElementById("kpiChronicRate").innerText = (data.summary.chronic_absenteeism_rate * 100).toFixed(1) + "%";
-    document.getElementById("kpiChronicCount").innerText = `${data.summary.chronic_absenteeism_count} students (≥10% missed)`;
-    document.getElementById("kpiAvgLms").innerText = data.summary.average_daily_lms_minutes + "m";
-    document.getElementById("kpiEarlyFlagged").innerText = (data.summary.early_warning_flagged_pct * 100).toFixed(1) + "%";
-    document.getElementById("kpiLeadTime").innerText = `Avg ~${Math.round(data.summary.average_early_warning_lead_time_days)}d lead time`;
+    // Update KPIs safely
+    const elTotal = document.getElementById("kpiTotalStudents");
+    if (elTotal) elTotal.innerText = data.summary.total_students;
+    const elAvgAtt = document.getElementById("kpiAvgAttendance");
+    if (elAvgAtt) elAvgAtt.innerText = (data.summary.average_attendance_rate * 100).toFixed(1) + "%";
+    const elChronic = document.getElementById("kpiChronicRate");
+    if (elChronic) elChronic.innerText = (data.summary.chronic_absenteeism_rate * 100).toFixed(1) + "%";
+    const elChronicCount = document.getElementById("kpiChronicCount");
+    if (elChronicCount) elChronicCount.innerText = `${data.summary.chronic_absenteeism_count} students (≥10% missed)`;
+    const elAvgLms = document.getElementById("kpiAvgLms");
+    if (elAvgLms) elAvgLms.innerText = data.summary.average_daily_lms_minutes + "m";
+    const elEarlyFlagged = document.getElementById("kpiEarlyFlagged");
+    if (elEarlyFlagged) elEarlyFlagged.innerText = (data.summary.early_warning_flagged_pct * 100).toFixed(1) + "%";
+    const elLeadTime = document.getElementById("kpiLeadTime");
+    if (elLeadTime) elLeadTime.innerText = `Avg ~${Math.round(data.summary.average_early_warning_lead_time_days)}d lead time`;
 
     // Render Charts
     renderOverviewCharts(data.summary);
@@ -322,23 +393,23 @@ async function loadStudents(page = 1) {
           <div class="font-bold text-slate-900 dark:text-slate-200 text-xs">${s.display_name}</div>
           <div class="text-slate-500 text-[10px] font-mono">${s.student_id}</div>
         </td>
-        <td class="py-2.5 px-3 font-sans text-slate-700 dark:text-slate-300 text-xs">
-          <div>${s.school_name}</div>
-          <div class="text-[10px] text-slate-500">Grade ${s.grade_level} &bull; GPA ${s.baseline_gpa}</div>
+        <td class="py-2.5 px-3 font-sans text-slate-700 dark:text-slate-300 text-xs overflow-hidden">
+          <div class="font-medium truncate" title="${s.school_name}">${s.school_name}</div>
+          <div class="text-[10px] text-slate-500 whitespace-nowrap">Grade ${s.grade_level} &bull; GPA ${s.baseline_gpa}</div>
         </td>
-        <td class="py-2.5 px-3 font-sans text-xs text-slate-600 dark:text-slate-400">
-          ${s.archetype_label}
+        <td class="py-2.5 px-3 font-sans text-xs text-slate-600 dark:text-slate-400 overflow-hidden">
+          <div class="truncate" title="${s.archetype_label}">${s.archetype_label}</div>
         </td>
-        <td class="py-2.5 px-3 text-xs ${s.chronic_absenteeism_flag ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-emerald-600 dark:text-emerald-400'}">
+        <td class="py-2.5 px-3 text-xs text-center ${s.chronic_absenteeism_flag ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-emerald-600 dark:text-emerald-400'}">
           ${attPct}% ${s.chronic_absenteeism_flag ? '⚠️' : ''}
         </td>
-        <td class="py-2.5 px-3 text-xs text-slate-700 dark:text-slate-300">
+        <td class="py-2.5 px-3 text-xs text-center text-slate-700 dark:text-slate-300">
           ${s.avg_daily_lms_minutes}m
         </td>
-        <td class="py-2.5 px-3 text-xs text-slate-700 dark:text-slate-300">
+        <td class="py-2.5 px-3 text-xs text-center text-slate-700 dark:text-slate-300">
           ${subPct}%
         </td>
-        <td class="py-2.5 px-3">
+        <td class="py-2.5 px-3 text-center">
           <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${riskPillColor}">
             ${s.risk_level} (${Math.round(s.composite_risk_score)})
           </span>
@@ -824,7 +895,7 @@ function applyPreset(presetName) {
 async function runGeneration() {
   const btn = document.getElementById("btnGenerate");
   const origText = btn.innerHTML;
-  btn.innerHTML = `<span>Synthesizing Cohort...</span>`;
+  btn.innerHTML = `<span class="flex items-center space-x-2"><svg class="animate-spin h-4 w-4 text-slate-900" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Synthesizing & Saving to SQLite...</span></span>`;
   btn.disabled = true;
 
   const numStudents = parseInt(document.getElementById("genStudents").value);
@@ -862,7 +933,7 @@ async function runGeneration() {
       return;
     }
 
-    // Refresh entire app state
+    // Refresh entire app state from SQLite database
     await initDashboard();
     switchTab("overview");
   } catch (err) {

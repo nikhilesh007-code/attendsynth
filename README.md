@@ -5,7 +5,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688.svg)](https://fastapi.tiangolo.com)
 [![Privacy: FERPA Safe](https://img.shields.io/badge/Privacy-FERPA%20Safe-10b981.svg)](#privacy-guarantees)
 [![Ed-Fi: Aligned](https://img.shields.io/badge/Data%20Standard-Ed--Fi%203.3-06b6d4.svg)](#ed-fi-alliance-standard-export)
-[![GitHub](https://img.shields.io/badge/GitHub-nikhilesh007--code-181717?logo=github)](https://github.com/nikhilesh007-code)
+[![Database: SQLite](https://img.shields.io/badge/Database-SQLite%20WAL-003B57.svg)](#database-architecture)
 
 **AttendSynth AI** is an enterprise-grade synthetic data generation engine and Early Warning System (EWS) modeling suite for Ed-Tech platforms, K-12 school districts, universities, and educational researchers.
 
@@ -121,7 +121,7 @@ Exports directly into the premier K-12 open data standard:
 ### Installation
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/nikhilesh007-code/attendsynth.git
+git clone https://github.com/organization/attendsynth.git
 cd attendsynth
 pip install -e .
 ```
@@ -215,14 +215,19 @@ Tests cover:
 
 ---
 
-## 👤 Author & Maintainer
+## 🗄️ Database Architecture & Persistence
 
-* **GitHub**: [@nikhilesh007-code](https://github.com/nikhilesh007-code)
-* **Repository**: [https://github.com/nikhilesh007-code/attendsynth](https://github.com/nikhilesh007-code/attendsynth)
+AttendSynth AI is backed by a relational **SQLite database** (`attendsynth.db`) managed via **SQLAlchemy 2.0 ORM** with **Write-Ahead Logging (WAL)** enabled for fast concurrent read/write operations.
+
+### Data Models
+- **`cohorts`**: Metadata, configuration seeds, term duration, and statistical summary metrics.
+- **`students`**: Individual synthetic student demographic, archetype, starting GPA, composite risk scores, and recommended interventions.
+- **`daily_records`**: Indexed relational records storing day-by-day attendance codes, LMS active minutes, logins, quiz scores, and daily engagement scores.
+- **`trained_models`**: Serialized model metadata, observation week parameters, ROC-AUC, confusion matrices, and feature importance rankings.
 
 ---
 
-## 📜 License
+## 📜 License & Compliance
 
-Apache License 2.0. Built for ethical educational AI development, early-warning prototyping, and student privacy preservation.
+Apache License 2.0. Built for ethical educational AI development, early-warning prototyping, and FERPA & COPPA student privacy preservation.
 

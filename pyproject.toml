@@ -10,13 +10,8 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
 authors = [
-    {name = "Nikhilesh", url = "https://github.com/nikhilesh007-code"}
+    {name = "AttendSynth AI Core Team"}
 ]
-urls = {
-    "Homepage" = "https://github.com/nikhilesh007-code/attendsynth",
-    "Repository" = "https://github.com/nikhilesh007-code/attendsynth",
-    "Author" = "https://github.com/nikhilesh007-code"
-}
 keywords = [
     "synthetic-data",
     "education",
@@ -26,7 +21,9 @@ keywords = [
     "lms",
     "differential-privacy",
     "ferpa",
-    "ed-fi"
+    "ed-fi",
+    "sqlite",
+    "sqlalchemy"
 ]
 dependencies = [
     "numpy>=1.24.0",
@@ -35,9 +32,9 @@ dependencies = [
     "fastapi>=0.100.0",
     "uvicorn>=0.20.0",
     "pydantic>=2.0.0",
+    "sqlalchemy>=2.0.0",
     "httpx>=0.24.0",
 ]
 
 [project.scripts]
 attendsynth = "attendsynth.cli:main"
-
