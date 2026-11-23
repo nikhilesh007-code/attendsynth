@@ -1,26 +1,25 @@
-# AttendSynth AI: Synthetic Student Engagement Generator
+# 🎓 AttendSynth AI: Synthetic Student Engagement Generator
 
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit 1.30+](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B.svg)](https://streamlit.io/)
+[![Groq LPU](https://img.shields.io/badge/Groq%20LPU-Llama%203.3%2070B-orange.svg)](https://groq.com/)
+[![Privacy Safe](https://img.shields.io/badge/Privacy-FERPA%20&%20Zero--PII-10b981.svg)](#privacy-guarantees)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688.svg)](https://fastapi.tiangolo.com)
-[![Privacy: FERPA Safe](https://img.shields.io/badge/Privacy-FERPA%20Safe-10b981.svg)](#privacy-guarantees)
-[![Ed-Fi: Aligned](https://img.shields.io/badge/Data%20Standard-Ed--Fi%203.3-06b6d4.svg)](#ed-fi-alliance-standard-export)
-[![Database: SQLite](https://img.shields.io/badge/Database-SQLite%20WAL-003B57.svg)](#database-architecture)
 
-**AttendSynth AI** is an enterprise-grade synthetic data generation engine and Early Warning System (EWS) modeling suite for Ed-Tech platforms, K-12 school districts, universities, and educational researchers.
+**AttendSynth AI** is a professional, full-stack educational data generation engine and Early Warning System (EWS) modeling suite. Designed to look and operate like an enterprise SaaS analytics product, AttendSynth AI synthesizes realistic, longitudinally coherent, and privacy-preserving student engagement datasets.
 
 ---
 
 ## 🎯 The Core Problem & Motivation
 
-Modern educational platforms and institutions want to train **Early Warning Systems (EWS)** that detect student disengagement, chronic absenteeism (>10% instructional days missed), and course failure **2 to 6 weeks in advance**—giving counselors and educators time to intervene proactively.
+Modern educational platforms, K-12 school districts, and university systems want to build predictive **Early Warning Systems (EWS)** to identify students vulnerable to disengagement, course failure, or chronic absenteeism **weeks before final exams**.
 
-However:
-1. **Strict Privacy Regulations**: Student educational records are legally protected under **FERPA** (Family Educational Rights and Privacy Act), **COPPA**, and GDPR. Sharing or utilizing real student telemetry across external development teams, QA environments, third-party AI vendors, or academic researchers exposes organizations to severe legal and compliance liabilities.
-2. **Cold-Start & Data Scarcity**: New educational programs, blended learning schools, and LMS platforms lack historical labeled datasets required to train predictive models.
-3. **Class Imbalance & Subtle Dynamics**: Chronic absenteeism and critical disengagement typically affect only 8–18% of the student cohort, and disengagement does not occur abruptly. Real students exhibit leading indicators—such as **spiking tardiness** and **decaying LMS activity**—weeks before failing to attend class.
+However, developing these systems faces three fundamental roadblocks:
+1. **Strict Privacy Regulations (FERPA & COPPA)**: Real student education records and telemetry are legally protected. Sharing or using real student PII in research, testing, or EdTech prototyping exposes organizations to severe legal liability.
+2. **Cold-Start & Data Scarcity**: New educational programs, blended learning schools, and digital LMS platforms lack historical labeled datasets required to train predictive models.
+3. **Complex Trajectory Dynamics**: Student disengagement is not a sudden binary event; students exhibit subtle leading indicators—such as **decaying LMS active time**, **increasing Monday/Friday tardiness**, and **late homework submissions**—weeks before failing to attend class.
 
-**AttendSynth AI** bridges this gap by generating **statistically faithful, longitudinally coherent, and mathematically privacy-preserving synthetic student cohorts**.
+**AttendSynth AI** bridges this gap by generating **statistically faithful, correlated, and mathematically privacy-preserving synthetic student cohorts**, pairing statistical simulation with **Groq ultra-fast LPU inference**.
 
 ---
 
@@ -28,206 +27,204 @@ However:
 
 ```mermaid
 flowchart TD
-    subgraph Config ["1. Cohort & Context Configuration"]
-        A1["School Calendar & Term (8-36 Wks)"]
-        A2["Behavioral Archetypes (6 Profiles)"]
-        A3["Privacy Parameters (k-Anon & ε-DP)"]
+    subgraph Config ["1. Cohort Configuration"]
+        A1["Cohort Size (50 - 2000 STUs)"]
+        A2["Instructional Term (4 - 16 Weeks)"]
+        A3["Population Profile (Balanced / Mostly Engaged / At-Risk Heavy)"]
+        A4["Random Seed (100% Reproducibility)"]
     end
 
-    subgraph Generator ["2. Longitudinal Synthesis Engine"]
-        B1["Synthetic Identity Generator (Zero-PII)"]
-        B2["Dynamic Trajectory Engine (Markov/Copula)"]
-        B3["Multimodal Daily Telemetry<br/>• Attendance Status<br/>• LMS Active Mins & Logins<br/>• Assignment Timeliness & Quizzes"]
+    subgraph Generator ["2. Core Synthesis Engine"]
+        B1["Fictional Identity Engine (Faker / Zero-PII)"]
+        B2["Latent Motivation Modeling (Multivariate Normal)"]
+        B3["Longitudinal Trajectory Synthesizer (Improving / Stable / Declining)"]
+        B4["Correlated Multimodal Indicators<br/>• Attendance % • In-Class Participation<br/>• Assignment Completion • LMS Logins • Assessment Marks"]
     end
 
-    subgraph PrivacyFidelity ["3. Privacy & Fidelity Audit"]
-        C1["Zero-PII Validator"]
-        C2["k-Anonymity Cluster Check (k ≥ 5)"]
-        C3["Differential Privacy Engine (Laplace Noise)"]
-        C4["Statistical Fidelity (KS-Test, JSD, Correlation Parity)"]
+    subgraph AnalyticalModules ["3. Analytical & AI Services"]
+        C1["Transparent Early Warning System (EWS Rules)"]
+        C2["Scikit-learn ML Lab (Random Forest & Decision Tree)"]
+        C3["Interactive Scenario Simulator (What-If Policy Shifts)"]
+        C4["Groq LPU LLM Engine (Llama 3.3 70B Diagnostics)"]
     end
 
-    subgraph ML_Lab ["4. Early-Warning ML Lab & Simulator"]
-        D1["Observation Window Slicer (Weeks 1-N)"]
-        D2["EWS Classifier (Random Forest / GBDT)"]
-        D3["Real-Time Risk Inference & Intervention Recommendation"]
-        D4["What-If Policy Intervention Simulator"]
-    end
-
-    subgraph Export ["5. Delivery & Interoperability"]
-        E1["FastAPI Backend & Interactive Web UI"]
-        E2["Ed-Fi Alliance Standard 3.3 JSON"]
-        E3["Longitudinal & Student Summary CSVs"]
+    subgraph Frontend ["4. Dark Navy SaaS Dashboard"]
+        D1["Executive KPI Cards & Badges"]
+        D2["Interactive Plotly Charts (Distributions & Trajectories)"]
+        D3["Individual Student Deep-Dive & Comparison Inspector"]
+        D4["Multi-Format Export Center (CSV, JSON, Multi-Sheet Excel)"]
     end
 
     Config --> Generator
-    Generator --> PrivacyFidelity
-    Generator --> ML_Lab
-    ML_Lab --> Export
-    PrivacyFidelity --> Export
+    Generator --> AnalyticalModules
+    AnalyticalModules --> Frontend
 ```
 
 ---
 
-## 🌟 Key Capabilities
+## 🚀 Key Modules & Capabilities
 
-### 1. Six Realistic Student Behavioral Archetypes
-Students aren't randomly distributed variables; they follow realistic educational trajectories:
-- **Consistent High Achiever**: High attendance (~97%), steady LMS telemetry, resilient through exam periods.
-- **Gradual Disengager (Primary EWS Target)**: Begins with solid engagement; **LMS active time drops first (weeks 3–5)**, followed by elevated tardiness, before severe unexcused absences begin.
-- **Sporadic / High Variance Attendee**: External obstacles (transportation, caregiving); sharp **Monday/Friday absenteeism drops** with midweek recovery.
-- **Late-Semester Slumper**: Stable performance until midterm exams (week 8–10), followed by burnout and rapid disengagement.
-- **Chronic Absentee**: Sub-75% attendance from early weeks, frequent unexcused absences, low assignment submission.
-- **Intervention Responder**: Starts disengaging; an educational intervention at week 8 triggers positive trajectory recovery.
+### 1. 📊 Executive Overview Dashboard
+- High-level KPI metric cards: Total Generated Students, Mean Attendance %, Composite Engagement Score, High/Medium/Low engagement counts, and High-Risk Learner tallies.
+- Interactive Plotly visualizations:
+  - **Composite Engagement Score Distribution** (Histogram color-coded by tier)
+  - **Attendance Distribution** with 60% Critical EWS Cutoff indicator
+  - **Academic Risk Tier Breakdown** (Donut chart with custom SaaS styling)
+  - **Longitudinal Trajectories** across instructional weeks with bold cohort mean
+  - **Course-Wise Performance Benchmarks**
 
-### 2. Multi-Modal Daily Telemetry
-For every instructional day across the semester, AttendSynth generates:
-- `attendance_status`: `PRESENT`, `TARDY`, `EXCUSED_ABSENCE`, `UNEXCUSED_ABSENCE`
-- `lms_active_minutes`: Continuous learning platform telemetry
-- `lms_logins`: Frequency of daily logins (Poisson distributed)
-- `assignment_submissions`: Timeliness flags (`ON_TIME`, `LATE`, `MISSED`)
-- `quiz_scores`: Formative assessment results
-- `daily_engagement_score`: Composite 0–100 index
+### 2. ⚙️ Synthetic Data Generator Studio
+- Configurable cohort sizes: **50, 100, 250, 500, 1000, 2000** students.
+- Configurable semester terms: **4, 8, 12, 16** weeks.
+- Enrolled course selection: Computer Science, Data Science, Linear Algebra, Academic Writing, Molecular Biology.
+- Four distinct **Population Behavioral Profiles**:
+  - `Balanced engagement`: Standard bell curve across all performance tiers.
+  - `Mostly engaged students`: High-achiever cohort with elevated attendance and participation.
+  - `At-risk-heavy population`: Stressed cohort with elevated disengagement and chronic absence.
+  - `Random distribution`: Wide variance across all metrics.
+- 100% reproducible statistical synthesis using random seeds.
 
-### 3. Enterprise Privacy Guarantees
-- **Zero Real-World PII**: Completely non-existent synthetic names, synthetic school codes, and standardized pseudo-identifiers (`SYNTH_STU_XXXX`).
-- **k-Anonymity Verification**: Validates that quasi-identifiers meet the threshold $k \ge 5$.
-- **Differential Privacy ($\epsilon$-DP)**: Built-in Laplace mechanism that injects calibrated noise $\text{Laplace}\left(0, \frac{\Delta f}{\epsilon}\right)$ when releasing aggregate analytics to external partners.
+### 3. 🔍 Student Analytics & Deep-Dive Explorer
+- Search students by **Name** or **Student ID**.
+- Filter by Course, Engagement Tier, or Risk Level.
+- **Single Student Inspector**: View complete academic telemetry and individual weekly trajectory sparklines.
+- **Side-by-Side Comparator**: Compare two students' attendance, LMS logins, and scores simultaneously.
+- **Multidimensional Correlation**: Interactive scatter plot comparing attendance versus participation colored by risk.
 
-### 4. Built-in Early Warning System (EWS) Machine Learning Lab
-- Trains scikit-learn ensemble models (**Random Forest**, **Gradient Boosting**, **Logistic Regression**) strictly on early observation data (e.g. Weeks 1–6) to predict full-semester Chronic Absenteeism.
-- Evaluates **ROC-AUC (typically > 0.90)**, Accuracy, Precision, Recall, Confusion Matrix, and ROC Curve points.
-- **Feature Importance**: Proves that early LMS minute decay and tardiness acceleration serve as leading predictive indicators before total absenteeism manifests.
-- **Real-Time Inference Sandbox**: Interactive sliders to predict risk probability and recommended interventions for custom student signals.
+### 4. 🚨 Transparent Early Warning System (EWS)
+- Transparent rule-based indicators identifying vulnerable learners:
+  - Attendance $< 60\%$
+  - In-Class Participation $< 40\%$
+  - Assignment Completion $< 50\%$
+  - Failing Assessment Marks $< 50\%$
+  - Chronic Late Submissions ($\ge 4$)
+  - Multi-Week Longitudinal Engagement Decay
+- Prioritized support roster with explicit trigger reasons.
+- Actionable Multi-Tiered System of Supports (MTSS) recommendations (Universal, Targeted, Intensive).
 
-### 5. What-If Policy Intervention Simulator
-Evaluate school district policy actions before spending budget:
-- **Automated Guardian SMS Nudges**: Simulates instant text alerts on tardy spikes.
-- **Counselor Case Management**: Simulates high-touch outreach for elevated-risk students.
-- **Friday Transport Assistance**: Simulates alleviating commute barriers for sporadic attendees.
-- Outputs baseline vs post-intervention chronic absenteeism rates and **students saved from academic crisis**.
+### 5. 🤖 Groq AI Insights Co-Pilot
+- Powered by the **official Groq Python SDK** and **Llama 3.3 70B** running on Groq LPUs at 500+ tokens/second.
+- **Zero-PII Compliance**: Transmits strictly aggregate dataset statistics (cohort size, mean attendance, risk proportions, course averages) rather than individual raw student records.
+- Preset one-click diagnostic prompts:
+  - *"Why are students showing disengagement?"*
+  - *"Analyze major attendance patterns and at-risk groups."*
+  - *"Which engagement factors are most critical?"*
+  - *"What MTSS interventions could improve participation?"*
+  - *"Executive Cohort Summary & Risk Analysis"*
+- Custom natural language question interface.
+- Automatic heuristic offline fallback if an API key is not yet configured.
 
-### 6. Ed-Fi Alliance Standard 3.3 Compatibility
-Exports directly into the premier K-12 open data standard:
-- `Student`
-- `StudentSchoolAssociation`
-- `StudentAttendanceEvent`
-- Compatible with modern district SIS (Student Information Systems) and Ed-Tech data warehouses.
+### 6. 🔮 What-If Policy & Scenario Simulator
+- Interactive simulation sliders adjusting:
+  - Attendance shift ($\Delta$: -30% to +30%)
+  - Participation shift ($\Delta$: -30% to +30%)
+  - Assignment completion shift ($\Delta$: -30% to +30%)
+  - LMS digital activity shift ($\Delta$: -50% to +50%)
+- Live Before-and-After outcome metrics:
+  - Projected Attendance and Engagement change
+  - **Count of students rescued from High-Risk classification**
+  - Relative risk reduction percentages
+
+### 7. 🧠 Machine Learning Lab
+- Benchmarks **Random Forest** and **Decision Tree** classifiers on synthetic features.
+- 80/20 stratified train/test split.
+- Performance evaluation: **Accuracy, Precision, Recall, and F1-Score**.
+- Interactive Plotly **Confusion Matrix Heatmap**.
+- Feature Importance ranking bar chart proving that early LMS decay and assignment submission serve as leading predictive indicators.
+
+### 8. 📥 Dataset Export & Download Center
+- Download the live generated dataset in multiple formats:
+  - **Flat Student Cohort CSV** (`attendsynth_students.csv`)
+  - **Longitudinal Weekly Time-Series CSV** (`attendsynth_weekly_timeseries.csv`)
+  - **Multi-Sheet Excel Workbook** (`attendsynth_complete_dataset.xlsx`) with formatted sheets for Students, Weekly Telemetry, and Course Analytics.
+  - **JSON Format** (`attendsynth_students.json`)
 
 ---
 
-## 🚀 Quickstart
+## 💻 Installation & Quickstart
 
-### Installation
-Clone the repository and install dependencies:
+### 1. Prerequisites
+- Python 3.9, 3.10, 3.11, or 3.12 installed.
+
+### 2. Clone the Repository & Install Dependencies
 ```bash
 git clone https://github.com/organization/attendsynth.git
 cd attendsynth
-pip install -e .
+pip install -r requirements.txt
 ```
 
-### Run the Interactive Demo
+### 3. (Optional) Configure Groq API Key
+AttendSynth AI works completely out of the box with offline heuristic fallbacks. To enable ultra-fast LPU AI reasoning:
+1. Obtain a free API key at **[console.groq.com/keys](https://console.groq.com/keys)**.
+2. Either create a `.env` file from `.env.example`:
+   ```bash
+   cp .env.example .env
+   # Add your key inside .env: GROQ_API_KEY=gsk_...
+   ```
+3. Or simply paste the key into the input field in the **Groq AI Insights** page inside the web application!
+
+### 4. Run the Streamlit Application
 ```bash
-python demo.py
+streamlit run app.py
 ```
+Then open your browser to: **`http://localhost:8501`**
 
-### Launch the Web UI & API Server
+---
+
+## 🧪 Automated Test Suite
+
+Run the full automated test suite covering statistical generation, rule evaluation, ML benchmarking, scenario simulator, and exports:
 ```bash
-python -m attendsynth serve --port 8000
+python -m unittest tests/test_stream_app.py
 ```
-Then navigate to: **`http://127.0.0.1:8000`**
+*(All 10 unit tests run and pass in ~1.5 seconds).*
 
 ---
 
-## 💻 Command-Line Interface (CLI)
+## 📁 Project File Structure
 
-```bash
-# 1. Synthesize a 300-student cohort across 16 weeks
-python -m attendsynth generate --students 300 --weeks 16 --preset standard_district --output data/cohort.json
-
-# 2. Train an Early-Warning Machine Learning Model on the synthetic data
-python -m attendsynth train --data data/cohort.json --model random_forest --weeks 6
-
-# 3. Audit privacy compliance and statistical fidelity
-python -m attendsynth audit --data data/cohort.json
-
-# 4. Export to Ed-Fi standard JSON
-python -m attendsynth export --data data/cohort.json --format edfi_json --output data/edfi_students.json
-
-# 5. Launch the Web Studio
-python -m attendsynth serve --port 8000
 ```
-
----
-
-## 🐍 Python SDK Example
-
-```python
-from attendsynth.config import Presets
-from attendsynth.generator import AttendSynthGenerator
-from attendsynth.models.early_warning import EarlyWarningPredictor
-from attendsynth.privacy import PrivacyAuditor
-
-# 1. Generate Cohort
-config = Presets.urban_at_risk(num_students=250, seed=42)
-generator = AttendSynthGenerator(config)
-cohort = generator.generate()
-
-# 2. Privacy Audit
-auditor = PrivacyAuditor(k_threshold=5)
-privacy_report = auditor.audit_cohort(cohort["students"])
-print("Privacy Compliance:", privacy_report["privacy_rating"])
-
-# 3. Train Early Warning System
-predictor = EarlyWarningPredictor(model_type="random_forest", observation_weeks=6)
-metrics = predictor.train_and_evaluate(cohort)
-print(f"EWS ROC-AUC: {metrics['roc_auc']:.4f}")
-
-# 4. Real-Time Risk Scoring
-student_early_signals = {
-    "early_attendance_rate": 0.86,
-    "early_tardy_rate": 0.14,
-    "early_unexcused_rate": 0.08,
-    "early_avg_daily_lms_minutes": 22.0,
-    "early_lms_trend_decay": 0.30,
-    "early_submission_rate": 0.70,
-    "early_quiz_average": 65.0,
-    "baseline_gpa": 2.5,
-}
-risk = predictor.predict_risk(student_early_signals)
-print("Predicted Risk Tier:", risk["predicted_risk_tier"])
-print("Recommended Action:", risk["recommended_action"])
+attendsynth/
+├── app.py                     # Main Streamlit router & shared state manager
+├── requirements.txt           # Project dependencies
+├── .env.example               # Template for Groq API key configuration
+├── .gitignore                 # Git ignore rules
+├── README.md                  # Comprehensive documentation
+├── core/                      # Modular backend engines
+│   ├── __init__.py            # Package exports
+│   ├── data_generator.py      # Correlated multivariate synthetic cohort generator
+│   ├── risk_engine.py         # Transparent rule-based Early Warning System
+│   ├── analytics.py           # Statistical aggregations and course metrics
+│   ├── scenario_simulator.py  # What-If policy intervention simulator
+│   ├── ml_model.py            # Scikit-learn Random Forest & Decision Tree classifier
+│   ├── ai_insights.py         # Groq API Llama 3.3 70B integration with fallback
+│   ├── visualizations.py      # Custom dark navy Plotly chart library
+│   └── views.py               # Modular view components for each page
+├── pages/                     # Streamlit multi-page interface files
+│   ├── 1_📊_Dashboard.py
+│   ├── 2_⚙️_Data_Generator.py
+│   ├── 3_🔍_Student_Analytics.py
+│   ├── 4_🚨_Early_Warning.py
+│   ├── 5_🤖_AI_Insights.py
+│   ├── 6_🔮_Scenario_Simulator.py
+│   ├── 7_🧠_Machine_Learning.py
+│   └── 8_📥_Export_Data.py
+├── styles/                    # SaaS Design System
+│   └── theme.py               # Dark navy CSS injection & KPI card renderers
+├── tests/                     # Automated test suites
+│   └── test_stream_app.py     # Unit tests verifying all core components
+└── data/                      # Output directory for exported CSV, Excel, and JSON
 ```
 
 ---
 
-## 🧪 Test Suite
+## 📜 Scientific & Ethical Disclaimers
 
-Run the full automated test suite:
-```bash
-python -m unittest discover -s tests
-```
-Tests cover:
-- Synthetic cohort generator and parameter constraints
-- Privacy zero-PII guarantees and k-anonymity validation
-- Early-warning ML model training, ROC-AUC benchmarking, and feature importances
-- FastAPI REST endpoints, JSON/CSV data exporters, and policy simulation logic
+1. **Synthetic Nature**: All student identities, scores, telemetry records, and names generated by AttendSynth AI are 100% fictional. No real student personal records or PII are used or exposed.
+2. **Predictive Transparency**: The Early Warning System and Machine Learning modules are designed for prototyping, research, and algorithmic benchmarking. Performance on synthetic data should not be interpreted as evidence of real-world clinical or diagnostic efficacy without validation against sanctioned institutional benchmarks.
 
 ---
 
-## 🗄️ Database Architecture & Persistence
+## 📄 License
 
-AttendSynth AI is backed by a relational **SQLite database** (`attendsynth.db`) managed via **SQLAlchemy 2.0 ORM** with **Write-Ahead Logging (WAL)** enabled for fast concurrent read/write operations.
-
-### Data Models
-- **`cohorts`**: Metadata, configuration seeds, term duration, and statistical summary metrics.
-- **`students`**: Individual synthetic student demographic, archetype, starting GPA, composite risk scores, and recommended interventions.
-- **`daily_records`**: Indexed relational records storing day-by-day attendance codes, LMS active minutes, logins, quiz scores, and daily engagement scores.
-- **`trained_models`**: Serialized model metadata, observation week parameters, ROC-AUC, confusion matrices, and feature importance rankings.
-
----
-
-## 📜 License & Compliance
-
-Apache License 2.0. Built for ethical educational AI development, early-warning prototyping, and FERPA & COPPA student privacy preservation.
-
+Apache License 2.0. Built for ethical educational AI development, early-warning prototyping, and student privacy preservation.
