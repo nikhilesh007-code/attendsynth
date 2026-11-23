@@ -1,132 +1,182 @@
 # AttendSynth AI – Synthetic Student Engagement & Academic Early Warning Platform
 
-![Version](https://img.shields.io/badge/version-2.2.0--Master-indigo.svg)
+![Version](https://img.shields.io/badge/version-2.5.0--SaaS--Production-emerald.svg)
 ![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014%20|%20TypeScript%20|%20TailwindCSS-black.svg)
 ![Backend](https://img.shields.io/badge/Backend-FastAPI%20|%20SQLAlchemy%20|%20SQLite-009688.svg)
-![AI Engine](https://img.shields.io/badge/AI-Groq%20Cloud%20Free%20Tier%20Optimized-f97316.svg)
+![AI Engine](https://img.shields.io/badge/AI-Groq%20Cloud%20LPU%20Inference-10b981.svg)
 ![FERPA](https://img.shields.io/badge/Compliance-FERPA%20Safe%20(Zero--PII)-emerald.svg)
+![Tests](https://img.shields.io/badge/Tests-24%20Passing-brightgreen.svg)
 
 ---
 
 ## 🏛️ Executive Summary
 
-Educational institutions and EdTech platforms require realistic student engagement datasets to prototype analytics and early warning systems. However, real student records are protected by strict privacy laws (FERPA / GDPR) and are difficult to obtain in volume.
+Educational institutions, data scientists, and EdTech platforms require realistic longitudinal student engagement data to develop, benchmark, and evaluate Early Warning Systems (EWS) and dropout prevention algorithms. However, real student data is strictly regulated under federal privacy frameworks (**FERPA** in the US, **GDPR** in the EU), making raw student records impossible to freely access or pass to third-party Large Language Models (LLMs).
 
-**AttendSynth AI** provides an enterprise-grade synthetic data generation and analytics platform. The application is completely institution-independent and course-independent, supporting dynamic institutions (e.g., SRM University, Horizon Metro), academic departments, customizable course catalogs, latent variable motivation modeling, and explainable multi-tiered academic risk calculations.
+**AttendSynth AI** solves this dilemma through a **hybrid Generative AI architecture**:
+1. **Generative Probabilistic Engine**: Synthesizes multi-week academic cohorts with realistic correlations among attendance, LMS digital telemetry, and assignment grades using **Latent Trait Modeling** ($\theta_i \sim \mathcal{N}(\mu, \sigma^2)$) and autoregressive time-series drift.
+2. **Generative Language Engine (Groq LLM)**: Ingests privacy-safe aggregate cohort moments (zero individual PII) to generate deep pedagogical diagnoses and structured Multi-Tiered System of Supports (MTSS) intervention plans.
 
 ---
 
-## ⚡ Architecture & Technology Stack
+## ⚡ High-Level System Architecture
 
 ```mermaid
-graph LR
-    subgraph Frontend [Next.js 14 TypeScript SaaS Frontend]
-        Dashboard[Overview Dashboard]
-        Generator[Generator Studio]
-        Curriculum[Curriculum & Institutions]
-        Analytics[Student Analytics & Roster]
-        EWS[Early Warning System]
-        GroqUI[Groq AI Insights]
-        Sim[Scenario Simulator]
-        MLLab[ML Laboratory]
-        Datasets[Dataset & Cohort Manager]
+graph TD
+    subgraph UI ["Next.js 14 SaaS Web Interface (Port 3000)"]
+        Overview["Executive Overview (KPIs & Trends)"]
+        GenStudio["Data Generator Studio (Custom Cohorts)"]
+        Curriculum["Institutions & Course Catalogs"]
+        Analytics["Student Analytics (Roster & Filters)"]
+        EWS["Early Warning System (MTSS Tiers)"]
+        AIInsights["Groq AI Pedagogical Insights"]
+        Datasets["Dataset Management & Multi-Export"]
+        Settings["System Telemetry & Groq Config"]
     end
 
-    subgraph Backend [FastAPI Backend Service]
-        InstRouter[Institutions & Depts CRUD]
-        CourseRouter[Dynamic Courses CRUD]
-        CohortRouter[Cohort & Dataset Router]
-        GenService[Latent Variable Motivation Engine]
-        RiskService[Transparent EWS Engine]
-        GroqService[Groq Free Tier SDK]
-        MLService[Scikit-Learn Benchmarks]
-        SimService[What-If Policy Engine]
+    subgraph API ["FastAPI High-Performance Backend (Port 8000)"]
+        RouterInst["/institutions & /departments"]
+        RouterCourse["/courses"]
+        RouterDataset["/datasets"]
+        RouterAnalytics["/analytics"]
+        RouterEWS["/early-warning"]
+        RouterAI["/ai"]
+        RouterStudents["/students"]
     end
 
-    subgraph Storage [SQLite Relational Database]
-        DB[(attendsynth.db)]
+    subgraph CoreEngines ["Core Computational Services"]
+        LatentGen["Latent Trait Generative Engine (NumPy/Pandas)"]
+        EWSEngine["Deterministic Heuristic Risk Engine"]
+        GroqService["Groq LPU Client (openai/gpt-oss-20b)"]
+        LocalFallback["Zero-PII Heuristic Synthesizer"]
     end
 
-    subgraph AI [Groq Cloud Inference]
-        GroqCloud[Groq openai/gpt-oss-20b]
+    subgraph Storage ["Database & External Services"]
+        DB[("SQLite 3 Relational DB (attendsynth.db)")]
+        GroqCloud["Groq Cloud LPU Inference API"]
     end
 
-    Frontend -->|REST API / JSON| Backend
-    Backend -->|SQLAlchemy ORM| Storage
-    Backend -->|Aggregate Zero-PII Context| AI
+    UI -->|REST JSON API| API
+    API --> CoreEngines
+    CoreEngines --> DB
+    GroqService -->|Aggregate Statistical Context| GroqCloud
 ```
 
-### 1. Frontend
-- **Framework**: Next.js 14 with App Router, React 18, TypeScript
-- **Styling**: Tailwind CSS with custom Dark Charcoal/Navy SaaS palette (`#090d16`, `#0e1526`, `#6366f1`)
-- **Visualizations**: Recharts (Longitudinal line charts, Donut distributions, Course bar charts)
-- **Icons**: Lucide React
-- **Design Inspiration**: Linear / Vercel / Stripe Dashboard aesthetic with collapsible sidebar, thin borders, and refined hierarchy
+---
 
-### 2. Backend
-- **Framework**: Python FastAPI 0.115+
-- **Database**: SQLite 3 with SQLAlchemy 2.0 ORM
-- **Data Engine**: Pandas & NumPy for multivariate latent Gaussian sampling
-- **Synthetic Generator**: Faker with deterministic random seeds
-- **Machine Learning**: Scikit-learn (Random Forest & Decision Tree classifiers)
-- **AI Co-Pilot**: Official Groq Python SDK with dynamic chat model selection & heuristic fallback
+## 🎨 Dual Theme System (Black & Green / White & Green)
+
+AttendSynth AI comes equipped with a custom-engineered dual theme built directly on Tailwind CSS and persistent React context:
+- **Dark Theme (Black & Emerald Green)**: Deep obsidian background (`#030712`), rich dark card surfaces (`#090e17`), crisp white typography, and vibrant emerald green accents (`#10b981`).
+- **Light Theme (White & Emerald Green)**: Ultra-clean white background (`#f8fafc`), pure white cards (`#ffffff`), dark slate text (`#0f172a`), and emerald green action buttons.
+- **Instant Persistence**: Toggled via the header theme button (`Sun` / `Moon`) with zero flash of unstyled content across browser refreshes.
+
+---
+
+## 🎯 The 8 Core Modules
+
+| Module | Route | Key Capabilities |
+| :--- | :--- | :--- |
+| **Executive Overview** | `/` | Headline KPI cards, 16-week dual-axis trajectory trendlines, engagement distribution donuts, binned attendance charts, priority attention queue, and automated AI executive diagnosis. |
+| **Data Generator Studio** | `/generator` | Synthesize academic cohorts (50 to 2000+ STUs, or custom sizes like `60`, `75`) across 6 population profiles (*Balanced, Mostly Engaged, At-Risk Heavy, Positive Drift, Engagement Decay, Multimodal Stress Test*). |
+| **Institutions & Courses** | `/curriculum` | Dynamic university taxonomy: multi-tier hierarchy spanning Institutions, Academic Departments, and Course Catalogs with credit allocations. |
+| **Student Analytics** | `/analytics` | Interactive student roster with multi-column sorting, search, risk filters, pagination, and a slide-over Student Dossier Drawer with weekly engagement timelines. |
+| **Early Warning System (EWS)** | `/early-warning` | Transparent rule-based diagnostic triggers (attendance $< 60\%$, missing assignments, engagement decay), composite risk score, and MTSS 4-week actionable support roadmaps. |
+| **Groq AI Insights** | `/ai-insights` | Natural language pedagogical co-pilot powered by Groq LPU inference (`openai/gpt-oss-20b`). Generates MTSS intervention plans and downloadable Markdown reports with zero PII exposure. |
+| **Dataset Management** | `/datasets` | Saved cohort persistence in SQLite, cohort activation, in-place renaming, deletion, side-by-side cohort comparative deltas, and multi-format exports (CSV, Weekly CSV, Excel, JSON). |
+| **System & API Settings** | `/settings` | Groq API key configuration, model selection, live connection ping latency test, and database storage telemetry. |
+
+---
+
+## 🤖 Generative AI: How & Where It Is Used
+
+AttendSynth AI is engineered around two distinct generative AI pillars:
+
+### 1. Generative Probabilistic Modeling (Data Generation)
+- **Engine**: [backend/services/data_generator.py](backend/services/data_generator.py)
+- **Technique**: Latent Trait Modeling (Item Response Theory) & Gaussian Mixture Distributions.
+- **How It Works**:
+  - Each student is assigned an underlying latent motivation variable:
+    $$\theta_i \sim \mathcal{N}(\mu, \sigma^2)$$
+  - From $\theta_i$, downstream interdependent time-series variables are derived across 4 to 30 weeks:
+    - **Weekly Attendance**: $P(\text{attend}_{i,t}) = \sigma(\theta_i - \beta_t + \epsilon_{i,t})$
+    - **LMS Telemetry**: Correlated weekly session counts, study hours, and activity logs.
+    - **Assignment Grades**: Gaussian performance distributions conditioned on weekly attendance and participation.
+- **Why Not an LLM for Rows?**: Using a Large Language Model to output 16,000 tabular numbers would be slow, token-expensive, non-deterministic, and prone to format hallucinations. The probabilistic generative model generates thousands of correlated records instantly with mathematical precision.
+
+### 2. Large Language Model (Pedagogical Reasoning)
+- **Engine**: [backend/services/groq_service.py](backend/services/groq_service.py)
+- **Hardware/Models**: Groq Cloud LPU acceleration running `openai/gpt-oss-20b` (default) and `qwen/qwen3.8-27b`.
+- **Zero-PII Prompt Serialization**:
+  - Student names and IDs are **never** transmitted to the cloud.
+  - The backend aggregates cohort moments (mean attendance, variance, tier percentages, course difficulty deltas) and prompts the LLM to generate qualitative diagnostics and MTSS intervention roadmaps.
+- **Local Fallback**: If offline or rate-limited, an on-device heuristic generator provides instant pedagogical feedback with zero downtime.
 
 ---
 
 ## 🚀 Quickstart Guide
 
 ### 1. Prerequisites
-- **Node.js**: v18+ or v20+ (Node v24 verified)
-- **Python**: 3.10+ (Python 3.11 verified)
+- **Node.js**: v18+ or v20+
+- **Python**: 3.10+ (Python 3.11 recommended)
+- **Git**
 
-### 2. Start the Backend API (Terminal 1)
+### 2. Installation & Environment Setup
+
 ```bash
-# In project root: c:\Users\nikhi\attendsynth
+# Clone the repository
+git clone https://github.com/nikhilesh007-code/attendsynth.git
+cd attendsynth
+
+# Set up Python backend environment
+cd backend
+pip install -r requirements.txt
+cp .env.example .env   # Add your free Groq API key if available
+
+# Set up Next.js frontend environment
+cd ../frontend
+npm install
+```
+
+### 3. Running the Platform
+
+#### Terminal 1: Start Backend API
+```bash
+# In project root:
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-*The backend will automatically create `attendsynth.db` and seed an initial 250-student baseline cohort with 4,000 longitudinal records.*
-- **API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **API Swagger Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **Health Check**: [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
 
-### 3. Start the Next.js Frontend (Terminal 2)
+#### Terminal 2: Start Next.js Frontend
 ```bash
-# In frontend directory: c:\Users\nikhi\attendsynth\frontend
+# In frontend directory:
 cd frontend
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your web browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🎯 Main Modules & Capabilities
+## 🧪 Automated Test Suite
 
-| Module | Description |
-| :--- | :--- |
-| **Executive Overview** | Headline KPI cards, 16-week longitudinal trendlines, engagement distribution donuts, binned attendance charts, and top priority outreach table. |
-| **Data Generator Studio** | Configurable cohort synthesis (50 to 2000 STUs, 4 to 16 weeks) across 4 population profiles (*Balanced, Mostly Engaged, At-Risk Heavy, Random*). |
-| **Student Analytics & Roster** | Full cohort table with search, multivariable filtering, sorting, pagination, and slide-in student dossiers showing 16-week time-series histories. |
-| **Early Warning System (EWS)** | Transparent rule triggers (<60% attendance, <50% assignments, etc.) and Multi-Tiered System of Supports (MTSS) Tier 1, 2, and 3 intervention plans. |
-| **Groq AI Pedagogical Insights** | Privacy-safe cohort diagnostics sending zero PII to Groq Cloud. Generates structured 6-part pedagogical diagnoses and downloadable Markdown reports. |
-| **Scenario Policy Simulator** | Interactive what-if policy sliders for attendance, participation, assignments, and LMS usage. Calculates exact counts of students rescued from high risk. |
-| **Machine Learning Laboratory** | Scikit-learn Random Forest and Decision Tree classifiers with accuracy, precision, recall, F1, confusion matrix, and feature importances. |
-| **Dataset Management** | SQLite persistence, active cohort switcher, cohort renaming, deletion, side-by-side comparison, and CSV / Excel / JSON export. |
-| **Settings & Telemetry** | Groq API key configuration, live connection ping, and database health metrics. |
-
----
-
-## 🔒 Zero-PII Compliance & Scientific Transparency
-
-> [!IMPORTANT]
-> **FERPA Compliance**: 100% of student identities, demographic names, attendance percentages, and marks are generated mathematically. No real student data is ever collected, stored, or transmitted.
-
-> [!NOTE]
-> **Scientific Disclosure**: High ML benchmark metrics and Early Warning risk scores reflect mathematical reproducibility within the simulated generator equations. They serve as transparent decision-support tools for educators rather than claims of causal predictive certainty.
-
----
-
-## 🧪 Running the Automated Test Suite
+AttendSynth AI includes comprehensive end-to-end and unit test suites:
 
 ```bash
-python -m unittest tests/test_fullstack.py
+python -m unittest discover -s tests -p "test_*.py"
 ```
-*All 8 end-to-end integration tests verify database initialization, cohort synthesis, student filtering, EWS rules, analytics distributions, what-if simulations, ML models, and dataset comparisons.*
+```
+........................
+----------------------------------------------------------------------
+Ran 24 tests in 2.133s
+
+OK
+```
+*Tests verify database initialization, cohort synthesis, student roster filtering, EWS risk scores, analytics distributions, dataset comparisons, and Groq fallback flows.*
+
+---
+
+## 🔒 Privacy & Compliance Disclosure
+
+- **FERPA Zero-PII Guarantee**: All student identities, demographic names, attendance percentages, LMS logs, and marks are generated synthetically. No real student data is ever collected, stored, or transmitted.
+- **Explainable Decision Support**: Early Warning risk scores and MTSS tiers reflect transparent, deterministic rules designed to assist educators rather than function as black-box automated penalties.
