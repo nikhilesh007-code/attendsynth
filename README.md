@@ -1,230 +1,132 @@
-# 🎓 AttendSynth AI: Synthetic Student Engagement Generator
+# AttendSynth AI – Synthetic Student Engagement & Academic Early Warning Platform
 
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit 1.30+](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B.svg)](https://streamlit.io/)
-[![Groq LPU](https://img.shields.io/badge/Groq%20LPU-Llama%203.3%2070B-orange.svg)](https://groq.com/)
-[![Privacy Safe](https://img.shields.io/badge/Privacy-FERPA%20&%20Zero--PII-10b981.svg)](#privacy-guarantees)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-
-**AttendSynth AI** is a professional, full-stack educational data generation engine and Early Warning System (EWS) modeling suite. Designed to look and operate like an enterprise SaaS analytics product, AttendSynth AI synthesizes realistic, longitudinally coherent, and privacy-preserving student engagement datasets.
+![Version](https://img.shields.io/badge/version-2.2.0--Master-indigo.svg)
+![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014%20|%20TypeScript%20|%20TailwindCSS-black.svg)
+![Backend](https://img.shields.io/badge/Backend-FastAPI%20|%20SQLAlchemy%20|%20SQLite-009688.svg)
+![AI Engine](https://img.shields.io/badge/AI-Groq%20Cloud%20Free%20Tier%20Optimized-f97316.svg)
+![FERPA](https://img.shields.io/badge/Compliance-FERPA%20Safe%20(Zero--PII)-emerald.svg)
 
 ---
 
-## 🎯 The Core Problem & Motivation
+## 🏛️ Executive Summary
 
-Modern educational platforms, K-12 school districts, and university systems want to build predictive **Early Warning Systems (EWS)** to identify students vulnerable to disengagement, course failure, or chronic absenteeism **weeks before final exams**.
+Educational institutions and EdTech platforms require realistic student engagement datasets to prototype analytics and early warning systems. However, real student records are protected by strict privacy laws (FERPA / GDPR) and are difficult to obtain in volume.
 
-However, developing these systems faces three fundamental roadblocks:
-1. **Strict Privacy Regulations (FERPA & COPPA)**: Real student education records and telemetry are legally protected. Sharing or using real student PII in research, testing, or EdTech prototyping exposes organizations to severe legal liability.
-2. **Cold-Start & Data Scarcity**: New educational programs, blended learning schools, and digital LMS platforms lack historical labeled datasets required to train predictive models.
-3. **Complex Trajectory Dynamics**: Student disengagement is not a sudden binary event; students exhibit subtle leading indicators—such as **decaying LMS active time**, **increasing Monday/Friday tardiness**, and **late homework submissions**—weeks before failing to attend class.
-
-**AttendSynth AI** bridges this gap by generating **statistically faithful, correlated, and mathematically privacy-preserving synthetic student cohorts**, pairing statistical simulation with **Groq ultra-fast LPU inference**.
+**AttendSynth AI** provides an enterprise-grade synthetic data generation and analytics platform. The application is completely institution-independent and course-independent, supporting dynamic institutions (e.g., SRM University, Horizon Metro), academic departments, customizable course catalogs, latent variable motivation modeling, and explainable multi-tiered academic risk calculations.
 
 ---
 
-## 🏗️ System Architecture
+## ⚡ Architecture & Technology Stack
 
 ```mermaid
-flowchart TD
-    subgraph Config ["1. Cohort Configuration"]
-        A1["Cohort Size (50 - 2000 STUs)"]
-        A2["Instructional Term (4 - 16 Weeks)"]
-        A3["Population Profile (Balanced / Mostly Engaged / At-Risk Heavy)"]
-        A4["Random Seed (100% Reproducibility)"]
+graph LR
+    subgraph Frontend [Next.js 14 TypeScript SaaS Frontend]
+        Dashboard[Overview Dashboard]
+        Generator[Generator Studio]
+        Curriculum[Curriculum & Institutions]
+        Analytics[Student Analytics & Roster]
+        EWS[Early Warning System]
+        GroqUI[Groq AI Insights]
+        Sim[Scenario Simulator]
+        MLLab[ML Laboratory]
+        Datasets[Dataset & Cohort Manager]
     end
 
-    subgraph Generator ["2. Core Synthesis Engine"]
-        B1["Fictional Identity Engine (Faker / Zero-PII)"]
-        B2["Latent Motivation Modeling (Multivariate Normal)"]
-        B3["Longitudinal Trajectory Synthesizer (Improving / Stable / Declining)"]
-        B4["Correlated Multimodal Indicators<br/>• Attendance % • In-Class Participation<br/>• Assignment Completion • LMS Logins • Assessment Marks"]
+    subgraph Backend [FastAPI Backend Service]
+        InstRouter[Institutions & Depts CRUD]
+        CourseRouter[Dynamic Courses CRUD]
+        CohortRouter[Cohort & Dataset Router]
+        GenService[Latent Variable Motivation Engine]
+        RiskService[Transparent EWS Engine]
+        GroqService[Groq Free Tier SDK]
+        MLService[Scikit-Learn Benchmarks]
+        SimService[What-If Policy Engine]
     end
 
-    subgraph AnalyticalModules ["3. Analytical & AI Services"]
-        C1["Transparent Early Warning System (EWS Rules)"]
-        C2["Scikit-learn ML Lab (Random Forest & Decision Tree)"]
-        C3["Interactive Scenario Simulator (What-If Policy Shifts)"]
-        C4["Groq LPU LLM Engine (Llama 3.3 70B Diagnostics)"]
+    subgraph Storage [SQLite Relational Database]
+        DB[(attendsynth.db)]
     end
 
-    subgraph Frontend ["4. Dark Navy SaaS Dashboard"]
-        D1["Executive KPI Cards & Badges"]
-        D2["Interactive Plotly Charts (Distributions & Trajectories)"]
-        D3["Individual Student Deep-Dive & Comparison Inspector"]
-        D4["Multi-Format Export Center (CSV, JSON, Multi-Sheet Excel)"]
+    subgraph AI [Groq Cloud Inference]
+        GroqCloud[Groq openai/gpt-oss-20b]
     end
 
-    Config --> Generator
-    Generator --> AnalyticalModules
-    AnalyticalModules --> Frontend
+    Frontend -->|REST API / JSON| Backend
+    Backend -->|SQLAlchemy ORM| Storage
+    Backend -->|Aggregate Zero-PII Context| AI
 ```
 
----
+### 1. Frontend
+- **Framework**: Next.js 14 with App Router, React 18, TypeScript
+- **Styling**: Tailwind CSS with custom Dark Charcoal/Navy SaaS palette (`#090d16`, `#0e1526`, `#6366f1`)
+- **Visualizations**: Recharts (Longitudinal line charts, Donut distributions, Course bar charts)
+- **Icons**: Lucide React
+- **Design Inspiration**: Linear / Vercel / Stripe Dashboard aesthetic with collapsible sidebar, thin borders, and refined hierarchy
 
-## 🚀 Key Modules & Capabilities
-
-### 1. 📊 Executive Overview Dashboard
-- High-level KPI metric cards: Total Generated Students, Mean Attendance %, Composite Engagement Score, High/Medium/Low engagement counts, and High-Risk Learner tallies.
-- Interactive Plotly visualizations:
-  - **Composite Engagement Score Distribution** (Histogram color-coded by tier)
-  - **Attendance Distribution** with 60% Critical EWS Cutoff indicator
-  - **Academic Risk Tier Breakdown** (Donut chart with custom SaaS styling)
-  - **Longitudinal Trajectories** across instructional weeks with bold cohort mean
-  - **Course-Wise Performance Benchmarks**
-
-### 2. ⚙️ Synthetic Data Generator Studio
-- Configurable cohort sizes: **50, 100, 250, 500, 1000, 2000** students.
-- Configurable semester terms: **4, 8, 12, 16** weeks.
-- Enrolled course selection: Computer Science, Data Science, Linear Algebra, Academic Writing, Molecular Biology.
-- Four distinct **Population Behavioral Profiles**:
-  - `Balanced engagement`: Standard bell curve across all performance tiers.
-  - `Mostly engaged students`: High-achiever cohort with elevated attendance and participation.
-  - `At-risk-heavy population`: Stressed cohort with elevated disengagement and chronic absence.
-  - `Random distribution`: Wide variance across all metrics.
-- 100% reproducible statistical synthesis using random seeds.
-
-### 3. 🔍 Student Analytics & Deep-Dive Explorer
-- Search students by **Name** or **Student ID**.
-- Filter by Course, Engagement Tier, or Risk Level.
-- **Single Student Inspector**: View complete academic telemetry and individual weekly trajectory sparklines.
-- **Side-by-Side Comparator**: Compare two students' attendance, LMS logins, and scores simultaneously.
-- **Multidimensional Correlation**: Interactive scatter plot comparing attendance versus participation colored by risk.
-
-### 4. 🚨 Transparent Early Warning System (EWS)
-- Transparent rule-based indicators identifying vulnerable learners:
-  - Attendance $< 60\%$
-  - In-Class Participation $< 40\%$
-  - Assignment Completion $< 50\%$
-  - Failing Assessment Marks $< 50\%$
-  - Chronic Late Submissions ($\ge 4$)
-  - Multi-Week Longitudinal Engagement Decay
-- Prioritized support roster with explicit trigger reasons.
-- Actionable Multi-Tiered System of Supports (MTSS) recommendations (Universal, Targeted, Intensive).
-
-### 5. 🤖 Groq AI Insights Co-Pilot
-- Powered by the **official Groq Python SDK** and **Llama 3.3 70B** running on Groq LPUs at 500+ tokens/second.
-- **Zero-PII Compliance**: Transmits strictly aggregate dataset statistics (cohort size, mean attendance, risk proportions, course averages) rather than individual raw student records.
-- Preset one-click diagnostic prompts:
-  - *"Why are students showing disengagement?"*
-  - *"Analyze major attendance patterns and at-risk groups."*
-  - *"Which engagement factors are most critical?"*
-  - *"What MTSS interventions could improve participation?"*
-  - *"Executive Cohort Summary & Risk Analysis"*
-- Custom natural language question interface.
-- Automatic heuristic offline fallback if an API key is not yet configured.
-
-### 6. 🔮 What-If Policy & Scenario Simulator
-- Interactive simulation sliders adjusting:
-  - Attendance shift ($\Delta$: -30% to +30%)
-  - Participation shift ($\Delta$: -30% to +30%)
-  - Assignment completion shift ($\Delta$: -30% to +30%)
-  - LMS digital activity shift ($\Delta$: -50% to +50%)
-- Live Before-and-After outcome metrics:
-  - Projected Attendance and Engagement change
-  - **Count of students rescued from High-Risk classification**
-  - Relative risk reduction percentages
-
-### 7. 🧠 Machine Learning Lab
-- Benchmarks **Random Forest** and **Decision Tree** classifiers on synthetic features.
-- 80/20 stratified train/test split.
-- Performance evaluation: **Accuracy, Precision, Recall, and F1-Score**.
-- Interactive Plotly **Confusion Matrix Heatmap**.
-- Feature Importance ranking bar chart proving that early LMS decay and assignment submission serve as leading predictive indicators.
-
-### 8. 📥 Dataset Export & Download Center
-- Download the live generated dataset in multiple formats:
-  - **Flat Student Cohort CSV** (`attendsynth_students.csv`)
-  - **Longitudinal Weekly Time-Series CSV** (`attendsynth_weekly_timeseries.csv`)
-  - **Multi-Sheet Excel Workbook** (`attendsynth_complete_dataset.xlsx`) with formatted sheets for Students, Weekly Telemetry, and Course Analytics.
-  - **JSON Format** (`attendsynth_students.json`)
+### 2. Backend
+- **Framework**: Python FastAPI 0.115+
+- **Database**: SQLite 3 with SQLAlchemy 2.0 ORM
+- **Data Engine**: Pandas & NumPy for multivariate latent Gaussian sampling
+- **Synthetic Generator**: Faker with deterministic random seeds
+- **Machine Learning**: Scikit-learn (Random Forest & Decision Tree classifiers)
+- **AI Co-Pilot**: Official Groq Python SDK with dynamic chat model selection & heuristic fallback
 
 ---
 
-## 💻 Installation & Quickstart
+## 🚀 Quickstart Guide
 
 ### 1. Prerequisites
-- Python 3.9, 3.10, 3.11, or 3.12 installed.
+- **Node.js**: v18+ or v20+ (Node v24 verified)
+- **Python**: 3.10+ (Python 3.11 verified)
 
-### 2. Clone the Repository & Install Dependencies
+### 2. Start the Backend API (Terminal 1)
 ```bash
-git clone https://github.com/organization/attendsynth.git
-cd attendsynth
-pip install -r requirements.txt
+# In project root: c:\Users\nikhi\attendsynth
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+*The backend will automatically create `attendsynth.db` and seed an initial 250-student baseline cohort with 4,000 longitudinal records.*
+- **API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Health Check**: [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
 
-### 3. (Optional) Configure Groq API Key
-AttendSynth AI works completely out of the box with offline heuristic fallbacks. To enable ultra-fast LPU AI reasoning:
-1. Obtain a free API key at **[console.groq.com/keys](https://console.groq.com/keys)**.
-2. Either create a `.env` file from `.env.example`:
-   ```bash
-   cp .env.example .env
-   # Add your key inside .env: GROQ_API_KEY=gsk_...
-   ```
-3. Or simply paste the key into the input field in the **Groq AI Insights** page inside the web application!
-
-### 4. Run the Streamlit Application
+### 3. Start the Next.js Frontend (Terminal 2)
 ```bash
-streamlit run app.py
+# In frontend directory: c:\Users\nikhi\attendsynth\frontend
+cd frontend
+npm run dev
 ```
-Then open your browser to: **`http://localhost:8501`**
+Open [http://localhost:3000](http://localhost:3000) in your web browser.
 
 ---
 
-## 🧪 Automated Test Suite
+## 🎯 Main Modules & Capabilities
 
-Run the full automated test suite covering statistical generation, rule evaluation, ML benchmarking, scenario simulator, and exports:
+| Module | Description |
+| :--- | :--- |
+| **Executive Overview** | Headline KPI cards, 16-week longitudinal trendlines, engagement distribution donuts, binned attendance charts, and top priority outreach table. |
+| **Data Generator Studio** | Configurable cohort synthesis (50 to 2000 STUs, 4 to 16 weeks) across 4 population profiles (*Balanced, Mostly Engaged, At-Risk Heavy, Random*). |
+| **Student Analytics & Roster** | Full cohort table with search, multivariable filtering, sorting, pagination, and slide-in student dossiers showing 16-week time-series histories. |
+| **Early Warning System (EWS)** | Transparent rule triggers (<60% attendance, <50% assignments, etc.) and Multi-Tiered System of Supports (MTSS) Tier 1, 2, and 3 intervention plans. |
+| **Groq AI Pedagogical Insights** | Privacy-safe cohort diagnostics sending zero PII to Groq Cloud. Generates structured 6-part pedagogical diagnoses and downloadable Markdown reports. |
+| **Scenario Policy Simulator** | Interactive what-if policy sliders for attendance, participation, assignments, and LMS usage. Calculates exact counts of students rescued from high risk. |
+| **Machine Learning Laboratory** | Scikit-learn Random Forest and Decision Tree classifiers with accuracy, precision, recall, F1, confusion matrix, and feature importances. |
+| **Dataset Management** | SQLite persistence, active cohort switcher, cohort renaming, deletion, side-by-side comparison, and CSV / Excel / JSON export. |
+| **Settings & Telemetry** | Groq API key configuration, live connection ping, and database health metrics. |
+
+---
+
+## 🔒 Zero-PII Compliance & Scientific Transparency
+
+> [!IMPORTANT]
+> **FERPA Compliance**: 100% of student identities, demographic names, attendance percentages, and marks are generated mathematically. No real student data is ever collected, stored, or transmitted.
+
+> [!NOTE]
+> **Scientific Disclosure**: High ML benchmark metrics and Early Warning risk scores reflect mathematical reproducibility within the simulated generator equations. They serve as transparent decision-support tools for educators rather than claims of causal predictive certainty.
+
+---
+
+## 🧪 Running the Automated Test Suite
+
 ```bash
-python -m unittest tests/test_stream_app.py
+python -m unittest tests/test_fullstack.py
 ```
-*(All 10 unit tests run and pass in ~1.5 seconds).*
-
----
-
-## 📁 Project File Structure
-
-```
-attendsynth/
-├── app.py                     # Main Streamlit router & shared state manager
-├── requirements.txt           # Project dependencies
-├── .env.example               # Template for Groq API key configuration
-├── .gitignore                 # Git ignore rules
-├── README.md                  # Comprehensive documentation
-├── core/                      # Modular backend engines
-│   ├── __init__.py            # Package exports
-│   ├── data_generator.py      # Correlated multivariate synthetic cohort generator
-│   ├── risk_engine.py         # Transparent rule-based Early Warning System
-│   ├── analytics.py           # Statistical aggregations and course metrics
-│   ├── scenario_simulator.py  # What-If policy intervention simulator
-│   ├── ml_model.py            # Scikit-learn Random Forest & Decision Tree classifier
-│   ├── ai_insights.py         # Groq API Llama 3.3 70B integration with fallback
-│   ├── visualizations.py      # Custom dark navy Plotly chart library
-│   └── views.py               # Modular view components for each page
-├── pages/                     # Streamlit multi-page interface files
-│   ├── 1_📊_Dashboard.py
-│   ├── 2_⚙️_Data_Generator.py
-│   ├── 3_🔍_Student_Analytics.py
-│   ├── 4_🚨_Early_Warning.py
-│   ├── 5_🤖_AI_Insights.py
-│   ├── 6_🔮_Scenario_Simulator.py
-│   ├── 7_🧠_Machine_Learning.py
-│   └── 8_📥_Export_Data.py
-├── styles/                    # SaaS Design System
-│   └── theme.py               # Dark navy CSS injection & KPI card renderers
-├── tests/                     # Automated test suites
-│   └── test_stream_app.py     # Unit tests verifying all core components
-└── data/                      # Output directory for exported CSV, Excel, and JSON
-```
-
----
-
-## 📜 Scientific & Ethical Disclaimers
-
-1. **Synthetic Nature**: All student identities, scores, telemetry records, and names generated by AttendSynth AI are 100% fictional. No real student personal records or PII are used or exposed.
-2. **Predictive Transparency**: The Early Warning System and Machine Learning modules are designed for prototyping, research, and algorithmic benchmarking. Performance on synthetic data should not be interpreted as evidence of real-world clinical or diagnostic efficacy without validation against sanctioned institutional benchmarks.
-
----
-
-## 📄 License
-
-Apache License 2.0. Built for ethical educational AI development, early-warning prototyping, and student privacy preservation.
+*All 8 end-to-end integration tests verify database initialization, cohort synthesis, student filtering, EWS rules, analytics distributions, what-if simulations, ML models, and dataset comparisons.*

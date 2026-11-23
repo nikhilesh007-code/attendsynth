@@ -1,0 +1,42 @@
+{
+  "1_groq_api_key_loaded": true,
+  "1_key_preview_masked": "gsk_...TT2C (56 chars total)",
+  "1_key_starts_with_gsk": true,
+  "2_configured_model": "openai/gpt-oss-20b",
+  "3_model_catalog_available_count": 11,
+  "3_configured_model_in_catalog": true,
+  "3_sample_catalog_models": [
+    "allam-2-7b",
+    "canopylabs/orpheus-arabic-saudi",
+    "canopylabs/orpheus-v1-english",
+    "meta-llama/llama-prompt-guard-2-22m",
+    "meta-llama/llama-prompt-guard-2-86m",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-safeguard-20b"
+  ],
+  "4_live_request_success": true,
+  "4_latency_ms": 572.4,
+  "4_tokens_used": 214,
+  "4_actual_response": "AttendSynth AI Groq integration successful.",
+  "4_target_phrase_match": true,
+  "5_http_429_handling": {
+    "catches_rate_limit_error": true,
+    "parses_retry_after_header": true,
+    "prevents_repeated_busy_loops": true,
+    "switches_to_local_fallback": true
+  },
+  "6_timeout_auth_handling": {
+    "catches_auth_error": true,
+    "invalid_key_status": "Groq Temporarily Unavailable",
+    "prevents_crash": true,
+    "never_exposes_secrets": true
+  },
+  "7_frontend_status_distinction": {
+    "key_present_untested": "Groq: Key Configured (Click to Test) [Neutral Indigo]",
+    "live_verified": "Groq: API Connected [Emerald Green with pulse]",
+    "rate_limited": "Groq: Rate Limited [Rose Red with Retry-After]",
+    "unavailable": "Groq: API Unavailable [Amber]",
+    "fallback_active": "Groq: Local Fallback Active [Slate/Amber]"
+  }
+}

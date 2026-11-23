@@ -1,0 +1,166 @@
+{
+  "1_db_file_path": "C:\\Users\\nikhi\\attendsynth\\backend\\attendsynth.db",
+  "1_db_exists": true,
+  "1_db_size_bytes": 1650688,
+  "1_database_url": "sqlite:///C:\\Users\\nikhi\\attendsynth\\backend\\attendsynth.db",
+  "2_connection_successful": true,
+  "2_sqlite_version": "3.45.1",
+  "3_tables": [
+    "cohort_courses",
+    "courses",
+    "datasets",
+    "departments",
+    "institutions",
+    "ml_runs",
+    "students",
+    "weekly_logs"
+  ],
+  "4_table_relationships": {
+    "cohort_courses": {
+      "primary_key": [
+        "cohort_id",
+        "course_id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "cohort_id"
+          ],
+          "referred_table": "datasets",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "constrained": [
+            "course_id"
+          ],
+          "referred_table": "courses",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "courses": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "department_id"
+          ],
+          "referred_table": "departments",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "datasets": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": []
+    },
+    "departments": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "institution_id"
+          ],
+          "referred_table": "institutions",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "institutions": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": []
+    },
+    "ml_runs": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "dataset_id"
+          ],
+          "referred_table": "datasets",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "students": {
+      "primary_key": [
+        "student_id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "dataset_id"
+          ],
+          "referred_table": "datasets",
+          "referred_columns": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "weekly_logs": {
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "constrained": [
+            "dataset_id"
+          ],
+          "referred_table": "datasets",
+          "referred_columns": [
+            "id"
+          ]
+        },
+        {
+          "constrained": [
+            "student_id"
+          ],
+          "referred_table": "students",
+          "referred_columns": [
+            "student_id"
+          ]
+        }
+      ]
+    }
+  },
+  "5_entity_counts": {
+    "institutions": 2,
+    "departments": 4,
+    "courses": 6,
+    "cohorts (datasets)": 10,
+    "students": 700,
+    "weekly_logs": 7600
+  },
+  "6_temp_cohort_id": "ds_afa5c59e",
+  "7_inserted_students_count": 5,
+  "7_inserted_weekly_logs": 20,
+  "9_restarted_students_count": 5,
+  "9_persisted_across_restart": true,
+  "10_cohort_deleted": true,
+  "10_cascaded_students_remaining": 0,
+  "10_cascaded_weekly_remaining": 0,
+  "11_dashboard_uses_live_sql": true,
+  "12_duplicate_students": 0,
+  "12_foreign_key_violations": 0
+}
